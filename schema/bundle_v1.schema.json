@@ -1,0 +1,344 @@
+{
+  "$defs": {
+    "BundleFiles": {
+      "description": "Which on-disk files the bundle actually contains.\n\n``True`` = file is present and schema-conformant. ``False`` =\nfile was intentionally skipped.\n\n``vectors_parquet`` is a sixth modality slot reserved for\nbehavioural / fingerprint vectors that don't fit the other four\nmodalities (e.g. timing-resonance signatures, derived\nbehavioural embeddings). Currently unpopulated in the v0.1.0\nreference corpus; the schema slot is reserved.",
+      "properties": {
+        "app_parquet": {
+          "default": false,
+          "title": "App Parquet",
+          "type": "boolean"
+        },
+        "host_parquet": {
+          "default": false,
+          "title": "Host Parquet",
+          "type": "boolean"
+        },
+        "packets_pcap": {
+          "default": true,
+          "title": "Packets Pcap",
+          "type": "boolean"
+        },
+        "protocol_parquet": {
+          "default": false,
+          "title": "Protocol Parquet",
+          "type": "boolean"
+        },
+        "responses_parquet": {
+          "default": false,
+          "title": "Responses Parquet",
+          "type": "boolean"
+        },
+        "vectors_parquet": {
+          "default": false,
+          "title": "Vectors Parquet",
+          "type": "boolean"
+        }
+      },
+      "title": "BundleFiles",
+      "type": "object"
+    },
+    "FamilyId": {
+      "description": "Chain-agnostic vulnerability-class label for a bundle.\n\nEnumeration: 10 attack families + 1 benign. ``reconnaissance`` is\na deferred-population slot in v0.1.0 \u2014 the scaffolded family for\npre-discovery and target-mapping activity (covered in upstream\nresearch but currently unpopulated in the public reference\ncorpus).",
+      "enum": [
+        "response_amp",
+        "compute_amp",
+        "memory_amp",
+        "connection_exhaustion",
+        "consensus_abuse",
+        "gossip_abuse",
+        "auth_bypass",
+        "rate_limiter_bypass",
+        "service_misconfig",
+        "reconnaissance",
+        "benign"
+      ],
+      "title": "FamilyId",
+      "type": "string"
+    },
+    "FidelityClass": {
+      "description": "How faithfully the bundle reproduces the real attack on the wire.\n\n- ``stub``: placeholder reproducer with hand-crafted or test-\n  vector-derived input. Shape-only; semantic parity with a real\n  attack is not claimed.\n- ``proxy``: wire shape reproduced via a substitute mechanism\n  that approximates but doesn't natively produce the attack\n  (e.g. a TCP-flood proxy approximating a custom-protocol flood).\n- ``lab``: full reproducer producing genuine attack traffic in a\n  controlled lab environment (localnet / private testnet).\n- ``lab-tls-fronted``: full reproducer producing genuine attack\n  traffic against a TLS-terminating proxy (nginx) in front of a\n  localnet validator, captured at two vantage points:\n  pre-termination wire (TLS frames; cipher-agnostic feature\n  surface) and post-termination loopback (cleartext;\n  full-feature surface).\n- ``production-captured``: sample directly captured from\n  production-deployed adversarial tooling. Reserved for future\n  production-ingest pipelines; no bundles in the v0.1.0\n  reference corpus carry this value.\n- ``production-derived``: lab reproduction parametrised by\n  patterns observed in production deployment. Bridges lab\n  fidelity with in-field ground truth. Reserved for future use.\n\nFuture-decomposition notice: this enum may be replaced or\ncomplemented in v0.2.0 with a structured pair of fields\n(``provenance.substrate`` \u00d7 ``provenance.traffic_origin``);\nthe change will be additive (existing readers stay compatible).",
+      "enum": [
+        "stub",
+        "proxy",
+        "lab",
+        "lab-tls-fronted",
+        "production-captured",
+        "production-derived"
+      ],
+      "title": "FidelityClass",
+      "type": "string"
+    },
+    "GroundTruthLabel": {
+      "enum": [
+        "attack",
+        "benign",
+        "suspicious"
+      ],
+      "title": "GroundTruthLabel",
+      "type": "string"
+    },
+    "Posture": {
+      "description": "Canonical posture taxonomy.\n\nThe first eight values cover the attack-side posture axis (rate /\nobfuscation / source-distribution variants of the attack). The\nfour ``*_normal`` values are benign-side organic-client postures:\n\n- ``wallet_normal`` \u2014 single-user wallet UI workload (5\u201315 s polls)\n- ``indexer_normal`` \u2014 backfilling indexer (0.1\u20130.5 s polls/worker)\n- ``light_client_normal`` \u2014 light client / health-check (30\u2013120 s polls)\n- ``mixed_normal`` \u2014 weighted mix of the above (50/30/20)\n\nAttack reproducers don't use the ``*_normal`` postures; benign\nreproducer-pipeline bundles don't use the attack-side eight.\n\nThe trailing four values are high-load benign postures driving\nthe validator into operational regimes that overlap attack\ndistributions on system-resource metrics \u2014 used to test that a\ndetector distinguishes attack-shape from benign-load-shape.",
+      "enum": [
+        "saturating",
+        "low-volume",
+        "distributed",
+        "mimicry",
+        "insider",
+        "validator-compromised",
+        "reconnaissance",
+        "historical-cve",
+        "wallet_normal",
+        "indexer_normal",
+        "light_client_normal",
+        "mixed_normal",
+        "dex_swap_burst",
+        "nft_mint_storm",
+        "indexer_backfill",
+        "mixed_high_load"
+      ],
+      "title": "Posture",
+      "type": "string"
+    },
+    "Provenance": {
+      "additionalProperties": true,
+      "description": "Bundle-production provenance. ``traffic_source``,\n``fidelity_class``, and ``target_authorisation`` are required so\nevery bundle carries unambiguous structured labels for downstream\ndataset curation.\n\nOther provenance fields are free-form extras (``extra=\"allow\"``)\nto keep room for per-recorder debugging info (return codes,\nprocess IDs, capture-module versions, ...) without schema churn.",
+      "properties": {
+        "engagement_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Opaque identifier referencing the customer engagement record. Required only when target_authorisation == customer-authorised. Null for self-owned / synthetic / public-mainnet-passive.",
+          "title": "Engagement Id"
+        },
+        "fidelity_class": {
+          "$ref": "#/$defs/FidelityClass",
+          "description": "How faithfully the bundle reproduces the real attack on the wire. stub / proxy / lab / lab-tls-fronted / production-captured / production-derived. Required \u2014 every bundle must declare fidelity."
+        },
+        "pcap_path_pre_termination": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional. Path to a secondary pcap captured at the pre-termination wire vantage when the bundle was captured behind a TLS-terminating proxy (fidelity_class=lab-tls-fronted dual-vantage capture). When set, the primary pcap.pcap is the post-termination loopback (cleartext, full feature surface) and this field references the pre-termination wire (TLS frames, cipher-agnostic feature surface). Null for single-vantage captures.",
+          "title": "Pcap Path Pre Termination"
+        },
+        "target_authorisation": {
+          "$ref": "#/$defs/TargetAuthorisation",
+          "description": "Authorisation scope for the target. Required \u2014 gates publication downstream."
+        },
+        "tooling": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Structured tool-version log: {tool_name: version} captured at bundle-produce time so downstream consumers know exactly which tooling produced the bundle. Required to be non-empty for family_id=reconnaissance bundles (off-the-shelf tooling drift between versions changes request shape \u2014 version pinning is load-bearing). Optional for other families but reproducers are encouraged to populate it.",
+          "title": "Tooling",
+          "type": "object"
+        },
+        "traffic_source": {
+          "$ref": "#/$defs/TrafficSource",
+          "description": "Required. synthetic-client / mainnet-organic / mixed / reproducer-attack / reproducer-benign / validator-under-load. See TrafficSource docstring."
+        }
+      },
+      "required": [
+        "traffic_source",
+        "fidelity_class",
+        "target_authorisation"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "TargetAuthorisation": {
+      "description": "Authorisation scope for the target that was captured.\n\nGates every downstream publication decision. A bundle with\n``target_authorisation`` other than ``self-owned`` / ``synthetic``\nrequires deliberate review before ever being published \u2014 the\npublication pipeline filters on this.\n\n- ``self-owned``: capture against operator-owned infrastructure\n  (test validators, owned fullnodes, internal localnet).\n- ``customer-authorised``: capture against third-party\n  infrastructure under explicit written authorisation (paid\n  engagement, signed scope-of-work). Requires the optional\n  ``engagement_id`` provenance field to be populated with the\n  engagement record's opaque identifier.\n- ``public-mainnet-passive``: passive capture of public mainnet\n  traffic from a fullnode under the operator's own control,\n  observing organic third-party clients.\n- ``synthetic``: capture against entirely synthetic targets with\n  no real validator software. Rare, unit-test fixtures only.",
+      "enum": [
+        "self-owned",
+        "customer-authorised",
+        "public-mainnet-passive",
+        "synthetic"
+      ],
+      "title": "TargetAuthorisation",
+      "type": "string"
+    },
+    "TrafficSource": {
+      "description": "How the captured traffic was produced.\n\n- ``synthetic-client``: traffic was generated by the bundle\n  producer itself and captured passively (no per-RPC\n  ``record_response`` calls \u2014 the ``responses.parquet`` modality\n  is unpopulated). Lightweight benign-capture pipeline.\n- ``mainnet-organic``: captured from a mainnet-synced fullnode\n  serving real clients; traffic source is third parties.\n- ``mixed``: a mix of the above (e.g. mainnet fullnode with\n  some synthetic probes interleaved).\n- ``reproducer-attack``: the traffic is the attack itself,\n  driven by a reproducer. The \"source\" is the adversarial\n  harness, not a legitimate client. ``record_response`` is\n  called per RPC; ``responses.parquet`` is populated.\n- ``reproducer-benign``: synthetic clients producing benign\n  traffic, captured through the **same reproducer pipeline as\n  reproducer-attack** (``record_response`` populated, host +\n  app monitored). Distinct from ``synthetic-client`` so dataset\n  curators can pair benign-bundles with the same modality-\n  population shape as attack-bundles when training a\n  capture-pipeline-co-linearity-aware detector.\n- ``validator-under-load``: high-load legitimate workloads\n  driving the validator into operational regimes overlapping\n  attack distributions on system metrics. Distinct from\n  ``reproducer-benign`` so leave-one-stratum-out holdout treats\n  it as a separate stratum.",
+      "enum": [
+        "synthetic-client",
+        "mainnet-organic",
+        "mixed",
+        "reproducer-attack",
+        "reproducer-benign",
+        "validator-under-load"
+      ],
+      "title": "TrafficSource",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Top-level manifest for one run.",
+  "properties": {
+    "assessment_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Assessment Id"
+    },
+    "attack_id": {
+      "title": "Attack Id",
+      "type": "string"
+    },
+    "attack_parameters": {
+      "additionalProperties": true,
+      "title": "Attack Parameters",
+      "type": "object"
+    },
+    "bundle_version": {
+      "default": 1,
+      "title": "Bundle Version",
+      "type": "integer"
+    },
+    "chain": {
+      "description": "'sui' | 'solana' | 'cosmos' | 'ethereum' | 'cross-chain'. Required from v1.0.",
+      "title": "Chain",
+      "type": "string"
+    },
+    "corpus_id": {
+      "description": "Globally unique bundle id.",
+      "title": "Corpus Id",
+      "type": "string"
+    },
+    "ended_at": {
+      "format": "date-time",
+      "title": "Ended At",
+      "type": "string"
+    },
+    "expected_detection_signature": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Detection Signature"
+    },
+    "family_id": {
+      "$ref": "#/$defs/FamilyId",
+      "description": "Chain-agnostic vulnerability-class label (see bundle_spec.taxonomy.FamilyId)."
+    },
+    "files": {
+      "$ref": "#/$defs/BundleFiles"
+    },
+    "generation_method": {
+      "default": "hand",
+      "enum": [
+        "hand",
+        "rules_v0",
+        "llm_v0",
+        "production_review",
+        "backfill_v0"
+      ],
+      "title": "Generation Method",
+      "type": "string"
+    },
+    "genome_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Deterministic hash of attack_parameters (see compute_genome_id). Nullable at the schema level because some bundles legitimately don't have one (e.g. passive-recorder captures). Required for attack bundles: a model validator asserts genome_id is non-null when ground_truth_label == 'attack'.",
+      "title": "Genome Id"
+    },
+    "ground_truth_label": {
+      "$ref": "#/$defs/GroundTruthLabel"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "posture": {
+      "$ref": "#/$defs/Posture"
+    },
+    "primitive_id": {
+      "description": "Chain-specific implementation of a family, e.g. 'sui_F10_multi_get_objects_amp' under family_id='response_amp'.",
+      "title": "Primitive Id",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "run_tag": {
+      "description": "Mutator-chosen label for this specific parametrisation.",
+      "title": "Run Tag",
+      "type": "string"
+    },
+    "shape": {
+      "description": "v0.0 = pcap-only (legacy ingest). v1.0 = full multi-modal.",
+      "enum": [
+        "v0.0",
+        "v1.0"
+      ],
+      "title": "Shape",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "target_env": {
+      "description": "Canonical env name, e.g. 'localnet-sui-multinode4', 'docker-misconfig-compose'.",
+      "title": "Target Env",
+      "type": "string"
+    }
+  },
+  "required": [
+    "shape",
+    "corpus_id",
+    "attack_id",
+    "family_id",
+    "primitive_id",
+    "posture",
+    "ground_truth_label",
+    "chain",
+    "run_tag",
+    "target_env",
+    "started_at",
+    "ended_at",
+    "provenance"
+  ],
+  "title": "BundleManifest",
+  "type": "object"
+}

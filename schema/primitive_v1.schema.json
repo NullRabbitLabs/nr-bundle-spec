@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "GroundTruthLabel": {
+      "enum": [
+        "attack",
+        "benign",
+        "suspicious"
+      ],
+      "title": "GroundTruthLabel",
+      "type": "string"
+    },
+    "ParameterSpec": {
+      "additionalProperties": false,
+      "description": "One tunable parameter on a primitive.",
+      "properties": {
+        "choices": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Choices"
+        },
+        "default": {
+          "default": null,
+          "title": "Default"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "int",
+            "float",
+            "str",
+            "bool",
+            "enum"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max"
+        },
+        "min": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min"
+        },
+        "mutator_scale": {
+          "anyOf": [
+            {
+              "enum": [
+                "linear",
+                "log",
+                "discrete"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mutator Scale"
+        },
+        "mutator_weight": {
+          "default": 1.0,
+          "minimum": 0.0,
+          "title": "Mutator Weight",
+          "type": "number"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "kind"
+      ],
+      "title": "ParameterSpec",
+      "type": "object"
+    },
+    "Posture": {
+      "description": "Canonical posture taxonomy.\n\nThe first eight values cover the attack-side posture axis (rate /\nobfuscation / source-distribution variants of the attack). The\nfour ``*_normal`` values are benign-side organic-client postures:\n\n- ``wallet_normal`` \u2014 single-user wallet UI workload (5\u201315 s polls)\n- ``indexer_normal`` \u2014 backfilling indexer (0.1\u20130.5 s polls/worker)\n- ``light_client_normal`` \u2014 light client / health-check (30\u2013120 s polls)\n- ``mixed_normal`` \u2014 weighted mix of the above (50/30/20)\n\nAttack reproducers don't use the ``*_normal`` postures; benign\nreproducer-pipeline bundles don't use the attack-side eight.\n\nThe trailing four values are high-load benign postures driving\nthe validator into operational regimes that overlap attack\ndistributions on system-resource metrics \u2014 used to test that a\ndetector distinguishes attack-shape from benign-load-shape.",
+      "enum": [
+        "saturating",
+        "low-volume",
+        "distributed",
+        "mimicry",
+        "insider",
+        "validator-compromised",
+        "reconnaissance",
+        "historical-cve",
+        "wallet_normal",
+        "indexer_normal",
+        "light_client_normal",
+        "mixed_normal",
+        "dex_swap_burst",
+        "nft_mint_storm",
+        "indexer_backfill",
+        "mixed_high_load"
+      ],
+      "title": "Posture",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Declarative spec for one attack primitive.",
+  "properties": {
+    "chain": {
+      "description": "'sui' | 'solana' | 'cosmos' | 'ethereum' | 'cross-chain'.",
+      "title": "Chain",
+      "type": "string"
+    },
+    "class_label": {
+      "description": "Pattern class: 'response-amp', 'async-wedge', 'filter-miss-scan', 'subscription-leak', 'admin-noauth', 'state-sync-flood', 'misconfig-service', 'reconnaissance', ...",
+      "title": "Class Label",
+      "type": "string"
+    },
+    "default_ground_truth": {
+      "$ref": "#/$defs/GroundTruthLabel"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "expected_detection_signature": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Detection Signature"
+    },
+    "parameters": {
+      "items": {
+        "$ref": "#/$defs/ParameterSpec"
+      },
+      "title": "Parameters",
+      "type": "array"
+    },
+    "primitive_id": {
+      "description": "Canonical id, e.g. 'F10_multi_get_objects_amp'.",
+      "title": "Primitive Id",
+      "type": "string"
+    },
+    "reproducer_path": {
+      "description": "Repo-relative path to the reproducer script in the harness repo.",
+      "title": "Reproducer Path",
+      "type": "string"
+    },
+    "requires_lab": {
+      "description": "Env name the scheduler must stand up, e.g. 'localnet-sui-multinode4', 'docker-misconfig-compose'.",
+      "title": "Requires Lab",
+      "type": "string"
+    },
+    "supported_postures": {
+      "items": {
+        "$ref": "#/$defs/Posture"
+      },
+      "title": "Supported Postures",
+      "type": "array"
+    }
+  },
+  "required": [
+    "primitive_id",
+    "chain",
+    "class_label",
+    "default_ground_truth",
+    "supported_postures",
+    "description",
+    "reproducer_path",
+    "requires_lab"
+  ],
+  "title": "PrimitiveDescriptor",
+  "type": "object"
+}
