@@ -1,0 +1,27 @@
+[package]
+name = "bundle-spec"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Bundle v1 — canonical multi-modal capture format for adversarial blockchain validator research. Reference parser + schema."
+authors = ["NullRabbit <simon@nullrabbit.ai>"]
+readme = "README.md"
+repository = "https://github.com/NullRabbitLabs/nr-bundle-spec"
+homepage = "https://github.com/NullRabbitLabs/nr-bundle-spec"
+keywords = ["bundle", "format", "blockchain", "validator", "security"]
+categories = ["data-structures", "encoding", "parser-implementations"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "1"
+sha2 = "0.10"
+arrow-schema = "53"
+jsonschema = "0.18"
+
+[dev-dependencies]
+serde_json = "1"
+
+[features]
+default = []
