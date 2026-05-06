@@ -9,8 +9,7 @@ use crate::errors::BundleError;
 
 /// Embedded JSON Schema for `BundleManifest` (regenerated from the
 /// canonical Pydantic models — see `tools/regen_schema.py`).
-pub const BUNDLE_MANIFEST_SCHEMA_JSON: &str =
-    include_str!("../../../schema/bundle_v1.schema.json");
+pub const BUNDLE_MANIFEST_SCHEMA_JSON: &str = include_str!("../../../schema/bundle_v1.schema.json");
 
 /// Embedded JSON Schema for `PrimitiveDescriptor`.
 pub const PRIMITIVE_DESCRIPTOR_SCHEMA_JSON: &str =
@@ -54,10 +53,9 @@ mod tests {
 
     #[test]
     fn bundled_manifest_schema_compiles() {
-        let schema: serde_json::Value =
-            serde_json::from_str(BUNDLE_MANIFEST_SCHEMA_JSON).unwrap();
-        let _ = jsonschema::JSONSchema::compile(&schema)
-            .expect("bundled manifest schema must compile");
+        let schema: serde_json::Value = serde_json::from_str(BUNDLE_MANIFEST_SCHEMA_JSON).unwrap();
+        let _ =
+            jsonschema::JSONSchema::compile(&schema).expect("bundled manifest schema must compile");
     }
 
     #[test]

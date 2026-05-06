@@ -54,7 +54,7 @@ pub use manifest::{
 pub use parquet::{
     app_ts_schema, host_ts_schema, protocol_ts_schema, responses_schema, vectors_schema,
 };
-pub use primitive::{ParameterSpec, ParameterKind, MutatorScale, PrimitiveDescriptor};
+pub use primitive::{MutatorScale, ParameterKind, ParameterSpec, PrimitiveDescriptor};
 pub use taxonomy::{family_definitions, FamilyId};
 pub use validation::{validate_manifest_json, validate_primitive_json};
 

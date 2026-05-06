@@ -155,10 +155,17 @@ mod tests {
     #[test]
     fn family_id_deserialises_from_wire_string() {
         for s in [
-            "response_amp", "compute_amp", "memory_amp",
-            "connection_exhaustion", "consensus_abuse", "gossip_abuse",
-            "auth_bypass", "rate_limiter_bypass", "service_misconfig",
-            "reconnaissance", "benign",
+            "response_amp",
+            "compute_amp",
+            "memory_amp",
+            "connection_exhaustion",
+            "consensus_abuse",
+            "gossip_abuse",
+            "auth_bypass",
+            "rate_limiter_bypass",
+            "service_misconfig",
+            "reconnaissance",
+            "benign",
         ] {
             let _: FamilyId = serde_json::from_str(&format!("\"{}\"", s)).unwrap();
         }
@@ -175,13 +182,23 @@ mod tests {
         let defs = family_definitions();
         assert_eq!(defs.len(), 11);
         for variant in [
-            FamilyId::ResponseAmp, FamilyId::ComputeAmp, FamilyId::MemoryAmp,
-            FamilyId::ConnectionExhaustion, FamilyId::ConsensusAbuse,
-            FamilyId::GossipAbuse, FamilyId::AuthBypass, FamilyId::RateLimiterBypass,
-            FamilyId::ServiceMisconfig, FamilyId::Reconnaissance, FamilyId::Benign,
+            FamilyId::ResponseAmp,
+            FamilyId::ComputeAmp,
+            FamilyId::MemoryAmp,
+            FamilyId::ConnectionExhaustion,
+            FamilyId::ConsensusAbuse,
+            FamilyId::GossipAbuse,
+            FamilyId::AuthBypass,
+            FamilyId::RateLimiterBypass,
+            FamilyId::ServiceMisconfig,
+            FamilyId::Reconnaissance,
+            FamilyId::Benign,
         ] {
-            assert!(defs.iter().any(|(v, _)| *v == variant),
-                "missing family definition for {:?}", variant);
+            assert!(
+                defs.iter().any(|(v, _)| *v == variant),
+                "missing family definition for {:?}",
+                variant
+            );
         }
     }
 }

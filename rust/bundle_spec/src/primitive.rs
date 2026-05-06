@@ -60,9 +60,7 @@ impl ParameterSpec {
     /// `choices` non-empty if provided.
     pub fn validate(&self) -> Result<(), BundleError> {
         if self.mutator_weight < 0.0 {
-            return Err(BundleError::Contract(
-                "mutator_weight must be >= 0".into(),
-            ));
+            return Err(BundleError::Contract("mutator_weight must be >= 0".into()));
         }
         if let Some(choices) = &self.choices {
             if choices.is_empty() {

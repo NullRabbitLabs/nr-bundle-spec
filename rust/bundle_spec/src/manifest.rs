@@ -20,22 +20,38 @@ pub const BUNDLE_VERSION: u32 = 1;
 /// `serde(rename)` because no single `rename_all` rule fits).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Posture {
-    #[serde(rename = "saturating")]            Saturating,
-    #[serde(rename = "low-volume")]            LowVolume,
-    #[serde(rename = "distributed")]           Distributed,
-    #[serde(rename = "mimicry")]               Mimicry,
-    #[serde(rename = "insider")]               Insider,
-    #[serde(rename = "validator-compromised")] ValidatorCompromised,
-    #[serde(rename = "reconnaissance")]        Reconnaissance,
-    #[serde(rename = "historical-cve")]        HistoricalCve,
-    #[serde(rename = "wallet_normal")]         WalletNormal,
-    #[serde(rename = "indexer_normal")]        IndexerNormal,
-    #[serde(rename = "light_client_normal")]   LightClientNormal,
-    #[serde(rename = "mixed_normal")]          MixedNormal,
-    #[serde(rename = "dex_swap_burst")]        DexSwapBurst,
-    #[serde(rename = "nft_mint_storm")]        NftMintStorm,
-    #[serde(rename = "indexer_backfill")]      IndexerBackfill,
-    #[serde(rename = "mixed_high_load")]       MixedHighLoad,
+    #[serde(rename = "saturating")]
+    Saturating,
+    #[serde(rename = "low-volume")]
+    LowVolume,
+    #[serde(rename = "distributed")]
+    Distributed,
+    #[serde(rename = "mimicry")]
+    Mimicry,
+    #[serde(rename = "insider")]
+    Insider,
+    #[serde(rename = "validator-compromised")]
+    ValidatorCompromised,
+    #[serde(rename = "reconnaissance")]
+    Reconnaissance,
+    #[serde(rename = "historical-cve")]
+    HistoricalCve,
+    #[serde(rename = "wallet_normal")]
+    WalletNormal,
+    #[serde(rename = "indexer_normal")]
+    IndexerNormal,
+    #[serde(rename = "light_client_normal")]
+    LightClientNormal,
+    #[serde(rename = "mixed_normal")]
+    MixedNormal,
+    #[serde(rename = "dex_swap_burst")]
+    DexSwapBurst,
+    #[serde(rename = "nft_mint_storm")]
+    NftMintStorm,
+    #[serde(rename = "indexer_backfill")]
+    IndexerBackfill,
+    #[serde(rename = "mixed_high_load")]
+    MixedHighLoad,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -106,8 +122,10 @@ impl Provenance {
     /// captures require `engagement_id`. Mirrors Python's
     /// `_engagement_id_required_for_customer` model_validator.
     pub fn validate(&self) -> Result<(), BundleError> {
-        if matches!(self.target_authorisation, TargetAuthorisation::CustomerAuthorised)
-            && self.engagement_id.as_deref().unwrap_or("").is_empty()
+        if matches!(
+            self.target_authorisation,
+            TargetAuthorisation::CustomerAuthorised
+        ) && self.engagement_id.as_deref().unwrap_or("").is_empty()
         {
             return Err(BundleError::Contract(
                 "engagement_id is required when \
@@ -321,10 +339,7 @@ mod tests {
         assert!(matches!(m.family_id, FamilyId::ResponseAmp));
         assert!(matches!(m.ground_truth_label, GroundTruthLabel::Attack));
         assert!(matches!(m.posture, Posture::Saturating));
-        assert!(matches!(
-            m.provenance.fidelity_class,
-            FidelityClass::Lab
-        ));
+        assert!(matches!(m.provenance.fidelity_class, FidelityClass::Lab));
     }
 
     #[test]
@@ -404,12 +419,11 @@ mod tests {
         let m: BundleManifest = serde_json::from_value(value.clone()).unwrap();
         let serialised = serde_json::to_value(&m).unwrap();
         assert_eq!(
-            serialised["provenance"]["custom_node_pid"], json!(12345),
+            serialised["provenance"]["custom_node_pid"],
+            json!(12345),
             "provenance extras must round-trip"
         );
-        assert_eq!(
-            serialised["provenance"]["tcpdump_returncode"], json!(0),
-        );
+        assert_eq!(serialised["provenance"]["tcpdump_returncode"], json!(0),);
     }
 
     #[test]
@@ -430,8 +444,14 @@ mod tests {
     fn target_authorisation_kebab_case_round_trip() {
         for (variant, expected) in [
             (TargetAuthorisation::SelfOwned, "self-owned"),
-            (TargetAuthorisation::CustomerAuthorised, "customer-authorised"),
-            (TargetAuthorisation::PublicMainnetPassive, "public-mainnet-passive"),
+            (
+                TargetAuthorisation::CustomerAuthorised,
+                "customer-authorised",
+            ),
+            (
+                TargetAuthorisation::PublicMainnetPassive,
+                "public-mainnet-passive",
+            ),
             (TargetAuthorisation::Synthetic, "synthetic"),
         ] {
             assert_eq!(serde_json::to_value(variant).unwrap(), json!(expected));

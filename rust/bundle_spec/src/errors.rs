@@ -9,9 +9,7 @@ pub enum BundleError {
     #[error("JSON parse error: {0}")]
     Json(#[from] serde_json::Error),
 
-    #[error(
-        "manifest contract violation: {0}"
-    )]
+    #[error("manifest contract violation: {0}")]
     Contract(String),
 
     #[error("schema validation error: {0}")]

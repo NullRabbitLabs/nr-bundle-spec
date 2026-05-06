@@ -66,15 +66,15 @@ fn round_trip_full_attack_manifest() {
         m.provenance.traffic_source,
         TrafficSource::ReproducerAttack,
     ));
-    assert!(matches!(
-        m.provenance.fidelity_class,
-        FidelityClass::Lab
-    ));
+    assert!(matches!(m.provenance.fidelity_class, FidelityClass::Lab));
     assert!(matches!(
         m.provenance.target_authorisation,
         TargetAuthorisation::SelfOwned,
     ));
-    assert_eq!(m.provenance.tooling.get("reproducer").map(|s| s.as_str()), Some("v0.4.2"));
+    assert_eq!(
+        m.provenance.tooling.get("reproducer").map(|s| s.as_str()),
+        Some("v0.4.2")
+    );
 
     // 4) Provenance extras preserved.
     assert_eq!(
@@ -119,8 +119,10 @@ fn benign_manifest_round_trips() {
 fn cross_language_genome_id_pin() {
     // Same vector as the Python tests in tests/test_contracts.py.
     let g = compute_genome_id(&json!({"a": 1, "b": 2, "c": 3}));
-    assert_eq!(g, "d97e5b9864df8961",
-        "genome_id determinism failed — Rust diverged from Python.");
+    assert_eq!(
+        g, "d97e5b9864df8961",
+        "genome_id determinism failed — Rust diverged from Python."
+    );
 }
 
 #[test]

@@ -107,8 +107,7 @@ fn write_value(v: &Value, out: &mut String) {
                 if i > 0 {
                     out.push_str(", ");
                 }
-                let escaped_k =
-                    serde_json::to_string(k).expect("string serialisation cannot fail");
+                let escaped_k = serde_json::to_string(k).expect("string serialisation cannot fail");
                 out.push_str(&escaped_k);
                 out.push_str(": ");
                 write_value(v, out);
@@ -161,7 +160,9 @@ mod tests {
     fn output_is_16_lowercase_hex() {
         let g = compute_genome_id(&json!({"any": "value"}));
         assert_eq!(g.len(), 16);
-        assert!(g.chars().all(|c| c.is_ascii_hexdigit() && (c.is_ascii_digit() || c.is_lowercase())));
+        assert!(g
+            .chars()
+            .all(|c| c.is_ascii_hexdigit() && (c.is_ascii_digit() || c.is_lowercase())));
     }
 
     /// Cross-language genome_id pin. Python output computed at
@@ -171,12 +172,15 @@ mod tests {
     #[test]
     fn matches_python_for_known_inputs() {
         let cases = [
-            (json!({"a": 1, "b": 2, "c": 3}),                              "d97e5b9864df8961"),
-            (json!({"outer": {"z": 1, "a": 2}, "extra": [1, 2, 3]}),       "11fdefa53bce2c19"),
-            (json!({"x": 1}),                                              "613fe5aa65343dbb"),
-            (json!({"x": 2}),                                              "24f572600e150d32"),
-            (json!({"any": "value"}),                                      "7a484828dd8b0184"),
-            (json!({"foo": 1, "bar": "baz"}),                              "4f1957df4ee6014e"),
+            (json!({"a": 1, "b": 2, "c": 3}), "d97e5b9864df8961"),
+            (
+                json!({"outer": {"z": 1, "a": 2}, "extra": [1, 2, 3]}),
+                "11fdefa53bce2c19",
+            ),
+            (json!({"x": 1}), "613fe5aa65343dbb"),
+            (json!({"x": 2}), "24f572600e150d32"),
+            (json!({"any": "value"}), "7a484828dd8b0184"),
+            (json!({"foo": 1, "bar": "baz"}), "4f1957df4ee6014e"),
         ];
         for (input, expected) in cases {
             let got = compute_genome_id(&input);
