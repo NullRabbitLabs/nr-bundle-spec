@@ -1,0 +1,67 @@
+{
+  "bundle_version": 1,
+  "shape": "v1.0",
+  "corpus_id": "crp_19d438471fec4229",
+  "attack_id": "atk_19d438471fec4229",
+  "genome_id": "861441ec51fa4044",
+  "assessment_id": null,
+  "family_id": "response_amp",
+  "primitive_id": "sui_F10_multi_get_objects_amp",
+  "posture": "low-volume",
+  "ground_truth_label": "attack",
+  "chain": "sui",
+  "run_tag": "step11_cell4_lvslow_w1_n5_d120",
+  "target_env": "localnet-sui-multinode4",
+  "generation_method": "hand",
+  "started_at": "2026-05-03T12:18:29.267767Z",
+  "ended_at": "2026-05-03T12:20:30.088549Z",
+  "attack_parameters": {
+    "workers": 1,
+    "duration_s": 120.0,
+    "ids_per_request": 5,
+    "timeout_s": 10.0,
+    "delay_ms": 1000,
+    "request_body_bytes": 582,
+    "rpc_method": "sui_multiGetObjects",
+    "show_flags": [
+      "showContent",
+      "showType",
+      "showOwner",
+      "showPreviousTransaction",
+      "showStorageRebate",
+      "showDisplay",
+      "showBcs"
+    ]
+  },
+  "expected_detection_signature": {
+    "class": "response-amp",
+    "observables": [
+      "sui_multiGetObjects request with showBcs=true",
+      "response bytes >> request bytes",
+      "amplification ratio ~1,500x on framework-package IDs"
+    ]
+  },
+  "files": {
+    "packets_pcap": false,
+    "host_parquet": true,
+    "app_parquet": false,
+    "protocol_parquet": false,
+    "responses_parquet": true,
+    "vectors_parquet": false
+  },
+  "provenance": {
+    "traffic_source": "reproducer-attack",
+    "fidelity_class": "lab-tls-fronted",
+    "target_authorisation": "self-owned",
+    "engagement_id": null,
+    "tooling": {},
+    "pcap_path_pre_termination": "pcap_pre_termination.pcap",
+    "nginx_vantage_host": "127.0.0.2",
+    "nginx_tls_port": 443,
+    "upstream_validator_port": 9010,
+    "tcpdump_returncode": 0,
+    "capture_module": "chains._shared.capture_multimodal",
+    "tcpdump_secondary_returncode": 0
+  },
+  "notes": "F10: see chains/sui/findings/F10/README.md for source evidence + disclosure timeline."
+}

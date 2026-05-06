@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this format, please cite it."
+title: "Bundle v1: A Multi-Modal Capture Format for Adversarial Research on Blockchain Validator Infrastructure"
+version: 0.1.0
+date-released: 2026-05-06
+license: MIT
+type: software
+authors:
+  - name: NullRabbit
+    alias: NullRabbitLabs
+    email: simon@nullrabbit.ai
+repository-code: "https://github.com/NullRabbitLabs/nr-bundle-spec"
+url: "https://github.com/NullRabbitLabs/nr-bundle-spec"
+keywords:
+  - bundle
+  - multi-modal capture
+  - blockchain
+  - validator
+  - adversarial research
+  - security
+  - dataset format
+  - response amplification
+  - compute amplification
+  - cross-chain holdout
+abstract: >-
+  Bundle v1 specifies the on-disk shape of a single attack (or benign)
+  run against a validator: a manifest, a packet capture, and four
+  time-series Parquet modalities (host, app, protocol, responses) all
+  keyed off a monotonic t_ns referenced to the manifest's started_at.
+  The format is designed for adversarial research on blockchain
+  validator infrastructure, with explicit support for cross-chain
+  holdout via a chain-agnostic family_id taxonomy paired with
+  chain-specific primitive_id labels. Provenance fidelity tiers
+  (stub / proxy / lab / lab-tls-fronted / production-captured /
+  production-derived) and target authorisation scope (self-owned /
+  customer-authorised / public-mainnet-passive / synthetic) are
+  required structured fields, gating downstream publication and
+  dataset curation. Reference parsers in Python and Rust ship under
+  MIT licence with byte-equivalent wire-format and genome_id
+  guarantees verified by cross-language test vectors.

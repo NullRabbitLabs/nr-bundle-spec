@@ -1,0 +1,66 @@
+{
+  "bundle_version": 1,
+  "shape": "v1.0",
+  "corpus_id": "crp_7dd10589c5f249b1",
+  "attack_id": "atk_7dd10589c5f249b1",
+  "genome_id": null,
+  "assessment_id": null,
+  "family_id": "benign",
+  "primitive_id": "sui_BENIGN_reproducer_pipeline",
+  "posture": "wallet_normal",
+  "ground_truth_label": "benign",
+  "chain": "sui",
+  "run_tag": "wallet_normal_d60_nows",
+  "target_env": "localnet-sui-multinode4",
+  "generation_method": "hand",
+  "started_at": "2026-05-03T12:20:30.446298Z",
+  "ended_at": "2026-05-03T12:21:39.344970Z",
+  "attack_parameters": {
+    "posture": "wallet_normal",
+    "workers": 2,
+    "poll_interval_min_s": 5.0,
+    "poll_interval_max_s": 15.0,
+    "duration_s": 60.0,
+    "include_ws_subscription": false,
+    "rng_seed_hex": "74a7f432805bda95",
+    "corpus_version": "v1.1",
+    "include_checkpoint_subscription": false,
+    "error_rate_target": 0.0,
+    "error_pattern_forced": null
+  },
+  "expected_detection_signature": {
+    "class": "benign-reproducer-pipeline",
+    "observables": [
+      "low-rate JSON-RPC mix matching organic Sui distribution",
+      "amp_ratio_max < 200",
+      "host.rss_slope_bps < 1 MB/s",
+      "host.cpu_max < 30%"
+    ]
+  },
+  "files": {
+    "packets_pcap": false,
+    "host_parquet": true,
+    "app_parquet": false,
+    "protocol_parquet": false,
+    "responses_parquet": true,
+    "vectors_parquet": false
+  },
+  "provenance": {
+    "traffic_source": "reproducer-benign",
+    "fidelity_class": "lab-tls-fronted",
+    "target_authorisation": "self-owned",
+    "engagement_id": null,
+    "tooling": {
+      "reproducer": "chains/sui/lab/drivers/benign_reproducer_pipeline.py",
+      "corpus_version": "v1.1"
+    },
+    "pcap_path_pre_termination": "pcap_pre_termination.pcap",
+    "nginx_vantage_host": "127.0.0.2",
+    "nginx_tls_port": 443,
+    "upstream_validator_port": 9010,
+    "tcpdump_returncode": 0,
+    "capture_module": "chains._shared.capture_multimodal",
+    "tcpdump_secondary_returncode": 0
+  },
+  "notes": "benign reproducer-pipeline v1.1 wallet_normal, workers=2, poll=5.00-15.00s, ws=False"
+}

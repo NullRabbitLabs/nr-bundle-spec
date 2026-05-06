@@ -1,0 +1,66 @@
+{
+  "bundle_version": 1,
+  "shape": "v1.0",
+  "corpus_id": "crp_88ad0855d3134aa7",
+  "attack_id": "atk_88ad0855d3134aa7",
+  "genome_id": null,
+  "assessment_id": null,
+  "family_id": "benign",
+  "primitive_id": "solana_BENIGN_organic_rpc",
+  "posture": "wallet_normal",
+  "ground_truth_label": "benign",
+  "chain": "solana",
+  "run_tag": "wallet_normal,dur=60s",
+  "target_env": "localnet-solana-test-validator-v2.2.16",
+  "generation_method": "hand",
+  "started_at": "2026-05-03T12:41:50.106806Z",
+  "ended_at": "2026-05-03T12:42:50.922199Z",
+  "attack_parameters": {
+    "posture": "wallet_normal",
+    "duration_s": 60.0,
+    "timeout_s": 5.0,
+    "target_error_rate": 0.015,
+    "stream_layout": [
+      "wallet_normal"
+    ],
+    "excluded_methods": [
+      "getProgramAccounts",
+      "sendTransaction"
+    ],
+    "simulate_tx_enabled": false
+  },
+  "expected_detection_signature": {
+    "class": "benign-organic",
+    "observables": [
+      "mixed solana RPC method-set with poly-shape responses",
+      "target read-side error rate ~1.5%",
+      "endpoint_unique_count >= 4 (organic mix, distinct from attack mono-method)",
+      "response_size_bytes_stddev high (mixed methods → mixed sizes)"
+    ]
+  },
+  "files": {
+    "packets_pcap": false,
+    "host_parquet": true,
+    "app_parquet": false,
+    "protocol_parquet": false,
+    "responses_parquet": true,
+    "vectors_parquet": false
+  },
+  "provenance": {
+    "traffic_source": "reproducer-benign",
+    "fidelity_class": "lab-tls-fronted",
+    "target_authorisation": "self-owned",
+    "engagement_id": null,
+    "tooling": {},
+    "pcap_path_pre_termination": "pcap_pre_termination.pcap",
+    "recorder": "chains/solana/lab/drivers/solana_BENIGN_organic_rpc.py",
+    "node_pid": 463106,
+    "nginx_vantage_host": "127.0.0.1",
+    "nginx_tls_port": 443,
+    "upstream_validator_port": 8899,
+    "tcpdump_returncode": 0,
+    "capture_module": "chains._shared.capture_multimodal",
+    "tcpdump_secondary_returncode": 0
+  },
+  "notes": "organic RPC mix at posture=wallet_normal; reproducer-benign TrafficSource — record_response populated (matches attack-side modality population). §v3.6: getProgramAccounts and sendTransaction excluded by design. See SOLANA-BENIGN-PRIMITIVES-DESIGN.md."
+}

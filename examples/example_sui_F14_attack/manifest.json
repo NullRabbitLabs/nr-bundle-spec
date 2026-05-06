@@ -1,0 +1,59 @@
+{
+  "bundle_version": 1,
+  "shape": "v1.0",
+  "corpus_id": "crp_45b32bd7878b4d73",
+  "attack_id": "atk_45b32bd7878b4d73",
+  "genome_id": "5235f8d2b3550436",
+  "assessment_id": null,
+  "family_id": "compute_amp",
+  "primitive_id": "sui_F14_devinspect_tokio_wedge",
+  "posture": "low-volume",
+  "ground_truth_label": "attack",
+  "chain": "sui",
+  "run_tag": "step11_cell2_sustained_w1_n500_d120",
+  "target_env": "localnet-sui-multinode4",
+  "generation_method": "hand",
+  "started_at": "2026-05-03T21:29:57.184972Z",
+  "ended_at": "2026-05-03T21:31:58.082978Z",
+  "attack_parameters": {
+    "pkg": "0xa7073cc4bd053f593b2fdd16e7ab122a813f47589bc0268032e181c9d4c0f122",
+    "n_sort": 500,
+    "workers": 1,
+    "duration_s": 120.0,
+    "gas_budget": 10000000000,
+    "timeout_s": 15.0,
+    "rpc_method": "sui_devInspectTransactionBlock",
+    "move_call": "burn_cpu_vector"
+  },
+  "expected_detection_signature": {
+    "class": "compute-amp:tokio-wedge",
+    "observables": [
+      "concurrent sui_devInspectTransactionBlock calls pinning tokio worker threads",
+      "host.cpu_max near 100% × num-cores during the wedge",
+      "app.sui_json_rpc_request_count.slope drops — dispatcher starved"
+    ]
+  },
+  "files": {
+    "packets_pcap": false,
+    "host_parquet": true,
+    "app_parquet": false,
+    "protocol_parquet": false,
+    "responses_parquet": true,
+    "vectors_parquet": false
+  },
+  "provenance": {
+    "traffic_source": "reproducer-attack",
+    "fidelity_class": "lab-tls-fronted",
+    "target_authorisation": "self-owned",
+    "engagement_id": null,
+    "tooling": {},
+    "pcap_path_pre_termination": "pcap_pre_termination.pcap",
+    "nginx_vantage_host": "127.0.0.2",
+    "nginx_tls_port": 444,
+    "upstream_validator_port": 9010,
+    "tcpdump_returncode": 0,
+    "capture_module": "chains._shared.capture_multimodal",
+    "tcpdump_secondary_returncode": 0
+  },
+  "notes": "F14: docs/sweeps/sui_F14_devinspect_tokio_wedge.md."
+}

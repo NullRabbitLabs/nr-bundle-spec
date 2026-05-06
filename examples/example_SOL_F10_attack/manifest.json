@@ -1,0 +1,64 @@
+{
+  "bundle_version": 1,
+  "shape": "v1.0",
+  "corpus_id": "crp_616e61ca867d4b12",
+  "attack_id": "atk_616e61ca867d4b12",
+  "genome_id": "a2987f5ba1ebcd97",
+  "assessment_id": null,
+  "family_id": "response_amp",
+  "primitive_id": "SOL_F10_multi_get_accounts_amp",
+  "posture": "saturating",
+  "ground_truth_label": "attack",
+  "chain": "solana",
+  "run_tag": "step11_cell2_satlow_w2_n25_d60",
+  "target_env": "localnet-solana-test-validator-v2.2.16",
+  "generation_method": "hand",
+  "started_at": "2026-05-03T12:30:41.925268Z",
+  "ended_at": "2026-05-03T12:31:42.822195Z",
+  "attack_parameters": {
+    "workers": 2,
+    "duration_s": 60.0,
+    "keys_per_request": 25,
+    "timeout_s": 30.0,
+    "request_body_bytes": 1273,
+    "rpc_method": "getMultipleAccounts",
+    "heavy_keys": [
+      "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "BPFLoader2111111111111111111111111111111111",
+      "BPFLoaderUpgradeab1e11111111111111111111111"
+    ],
+    "encoding": "base64"
+  },
+  "expected_detection_signature": {
+    "class": "response-amp",
+    "observables": [
+      "getMultipleAccounts request with up to 100 keys",
+      "response bytes >> request bytes",
+      "amplification ratio ~1,260x on heavy program-data accounts",
+      "sustained server egress 500-830 MB/s at 8 workers"
+    ]
+  },
+  "files": {
+    "packets_pcap": false,
+    "host_parquet": true,
+    "app_parquet": false,
+    "protocol_parquet": false,
+    "responses_parquet": true,
+    "vectors_parquet": false
+  },
+  "provenance": {
+    "traffic_source": "reproducer-attack",
+    "fidelity_class": "lab-tls-fronted",
+    "target_authorisation": "self-owned",
+    "engagement_id": null,
+    "tooling": {},
+    "pcap_path_pre_termination": "pcap_pre_termination.pcap",
+    "nginx_vantage_host": "127.0.0.1",
+    "nginx_tls_port": 443,
+    "upstream_validator_port": 8899,
+    "tcpdump_returncode": 0,
+    "capture_module": "chains._shared.capture_multimodal",
+    "tcpdump_secondary_returncode": 0
+  },
+  "notes": "SOL_F10: F10 mechanism transferred to Solana JSON-RPC. See chains/solana/research/CYCLE-1-PLAN-2026-04-30.md."
+}
