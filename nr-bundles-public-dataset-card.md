@@ -237,19 +237,39 @@ This dataset is intended for:
 
 ## How to use this dataset
 
-```python
-from datasets import load_dataset
+Each bundle is a directory of Parquet files plus a manifest, with
+schemas that vary by modality. The dataset is **tree-shaped**, not
+tabular, so the canonical way to consume it is `snapshot_download`
+followed by the bundle-spec reference parsers:
 
-dataset = load_dataset("NullRabbit/nr-bundles-public")
+```python
+from huggingface_hub import snapshot_download
+from bundle_spec import BundleManifest  # nr-bundle-spec / python
+import json
+from pathlib import Path
+
+# Pull the full dataset (or use allow_patterns=["crp_<id>/*"] for one bundle).
+local = snapshot_download(repo_id="NullRabbit/nr-bundles-public",
+                          repo_type="dataset")
+
+# Iterate bundles
+for bundle_dir in sorted(Path(local).glob("crp_*")):
+    manifest = BundleManifest.model_validate_json(
+        (bundle_dir / "manifest.json").read_text()
+    )
+    print(manifest.primitive_id, manifest.family_id, manifest.fidelity_class)
+    # Each modality is a Parquet file — read with pyarrow / pandas / polars
+    # as the modality demands. See nr-bundle-spec for per-modality schemas.
 ```
 
-Each bundle is stored as a directory of Parquet files plus a manifest.
-The bundle v1 reference parsers (Python and Rust) live in
-`nr-bundle-spec` and can be used to load and validate bundles
-programmatically.
+`datasets.load_dataset("NullRabbit/nr-bundles-public")` does **not**
+work on this dataset — HF's auto-loader assumes a single tabular
+schema, which doesn't match the multi-modal bundle layout. Use
+`snapshot_download` + the bundle-spec parsers as shown above.
 
-For schema, validation, and reference parsers, see
+For schema, validation, and reference parsers (Python + Rust), see
 [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec).
+A validator CLI is available at `tools/validate_bundle.py`.
 
 ## Licensing
 
