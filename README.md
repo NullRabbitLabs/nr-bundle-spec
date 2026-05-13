@@ -46,9 +46,23 @@ and the cross-language schema contract. With this in place:
   travels with the data, so dataset curators can stratify cleanly
   on it.
 
-A reference dataset is published separately at
-[NullRabbitLabs/nr-bundles-public](https://huggingface.co/datasets/NullRabbitLabs/nr-bundles-public)
-(forthcoming).
+## Reference public bundles
+
+A curated sample of 31 bundles conformant with this spec is published
+on Hugging Face:
+
+**[nr-bundles-public](https://huggingface.co/datasets/NullRabbit/nr-bundles-public)**
+
+Multi-modal observations of blockchain validator infrastructure under
+attack and benign workloads, covering 7 vulnerability families across
+Sui and Solana. CC-BY-4.0.
+
+Use these bundles to:
+
+- Test parsers and tooling built against this spec
+- Benchmark anomaly detection models on validator-infrastructure
+  network data
+- Reference the format in academic citations
 
 ## What's in a bundle
 
