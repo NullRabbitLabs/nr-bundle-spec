@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-05-13
+
+### Clarified
+
+- **`BundleFiles` flag-semantics** (`python/bundle_spec/bundle_v1.py`): tightened the docstring to spell out the forward-only contract. `True` ⇒ file MUST be present and schema-conformant; `False` ⇒ no on-disk constraint (the file may exist as an empty placeholder per the reference-example convention, but consumers should not read it). The change aligns the docstring with the actual semantics already implemented by `tools/validate_bundle.py` and observed in the v0.1.0 reference example bundles, where some `False`-flagged modalities ship empty placeholder files. No on-the-wire schema change; this is a contract clarification only.
+
+### Added
+
+- **`tools/validate_bundle.py`**: release-cert validator CLI that walks bundle directories + asserts each manifest validates against `BundleManifest` + asserts flag-honest file presence per the forward-only `BundleFiles` semantic. Per-bundle release-cert JSON output when `--cert-out` supplied. Smoke-tested against the 5 reference example bundles (5/5 pass).
+
 ## [0.1.0] — 2026-05-06
 
 ### Added

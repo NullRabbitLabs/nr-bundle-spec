@@ -289,16 +289,35 @@ class Provenance(BaseModel):
 
 
 class BundleFiles(BaseModel):
-    """Which on-disk files the bundle actually contains.
+    """Which on-disk modalities the bundle considers schema-conformant.
 
-    ``True`` = file is present and schema-conformant. ``False`` =
-    file was intentionally skipped.
+    Semantics (forward-only contract):
+
+    - ``True``: the named file MUST be present in the bundle directory
+      and is conformant with the modality's schema. Consumers should
+      read it.
+    - ``False``: the modality is NOT considered conformant for this
+      bundle. The file MAY OR MAY NOT exist on disk; if it does, it is
+      typically an empty placeholder (e.g. zero-row Parquet) or a
+      non-conformant capture that the producer didn't include in the
+      bundle's effective modality set. Consumers SHOULD NOT read it.
+
+    This asymmetric semantic exists because the reference example
+    bundles (and many producers' captures) ship empty placeholders for
+    modalities that didn't capture during a workload — for instance a
+    passive-fullnode benign bundle has no RPC traffic to serve, so
+    ``responses.parquet`` exists as an empty placeholder but
+    ``responses_parquet=False``. Validators should enforce the forward
+    direction only (``True`` ⇒ file present); reverse-checking
+    ``False`` ⇒ file absent breaks against the existing example
+    convention. The validator at ``tools/validate_bundle.py``
+    implements the forward-only check.
 
     ``vectors_parquet`` is a sixth modality slot reserved for
     behavioural / fingerprint vectors that don't fit the other four
-    modalities (e.g. timing-resonance signatures, derived
-    behavioural embeddings). Currently unpopulated in the v0.1.0
-    reference corpus; the schema slot is reserved.
+    modalities (e.g. timing-resonance signatures, derived behavioural
+    embeddings). Currently unpopulated in the v0.1.0 reference corpus;
+    the schema slot is reserved.
     """
 
     packets_pcap: bool = True
