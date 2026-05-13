@@ -112,34 +112,51 @@ Twenty-two Solana, nine Sui. Seventeen bundles at `fidelity_class:
 lab-tls-fronted` (retain pre-term TLS pcap), fourteen at
 `fidelity_class: lab` (no TLS termination; raw pcap dropped).
 
+The `Pcap modality` column below specifies which network-layer file is
+present on disk per bundle: `pre-term TLS` means
+`pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP
+headers visible); `none` means the raw `packets.pcap` was dropped and no
+pre-term variant exists (`BundleFiles.packets_pcap=False` in the
+manifest).
+
 **Solana (22 bundles)**
 
-| Primitive | Family | Bundles | Fidelity | Coverage |
-|---|---|---|---|---|
-| `SOL_F10_multi_get_accounts_amp` | response_amp | 4 | lab-tls-fronted | 4 postures |
-| `SOL_F14_simulate_transaction_sync_wedge` | compute_amp | 4 | lab-tls-fronted | 4 postures |
-| `SOL_P07_get_program_accounts_filter_miss` | rate_limiter_bypass | 5 | lab | 5 postures |
-| `SOL_RC_nmap_slow` | reconnaissance | 1 | lab | saturating posture |
-| `SOL_MC_grafana_anon` | service_misconfig | 1 | lab | saturating posture |
-| `SOL_MC_ssh_pwauth` | service_misconfig | 1 | lab | saturating posture |
-| `SOL_H01_admin_rpc_probe` | auth_bypass | 1 | lab | saturating posture |
-| `SOL_GR01_simulate_compute_flood` | rate_limiter_bypass | 1 | lab | saturating posture |
-| `solana_BENIGN_organic_rpc` | benign | 2 | lab-tls-fronted | mixed postures |
-| `solana_BENIGN_validator_passive` | benign | 2 | lab | mixed postures |
+| Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
+|---|---|---|---|---|---|
+| `SOL_F10_multi_get_accounts_amp` | response_amp | 4 | lab-tls-fronted | pre-term TLS | 4 postures |
+| `SOL_F14_simulate_transaction_sync_wedge` | compute_amp | 4 | lab-tls-fronted | pre-term TLS | 4 postures |
+| `SOL_P07_get_program_accounts_filter_miss` | rate_limiter_bypass | 5 | lab | none | 5 postures |
+| `SOL_RC_nmap_slow` | reconnaissance | 1 | lab | none | saturating posture |
+| `SOL_MC_grafana_anon` | service_misconfig | 1 | lab | none | saturating posture |
+| `SOL_MC_ssh_pwauth` | service_misconfig | 1 | lab | none | saturating posture |
+| `SOL_H01_admin_rpc_probe` | auth_bypass | 1 | lab | none | saturating posture |
+| `SOL_GR01_simulate_compute_flood` | rate_limiter_bypass | 1 | lab | none | saturating posture |
+| `solana_BENIGN_organic_rpc` | benign | 2 | lab-tls-fronted | pre-term TLS | mixed postures |
+| `solana_BENIGN_validator_passive` | benign | 2 | lab | none | mixed postures |
 
 The SOL_F10 / SOL_F14 / SOL_P07 primitives correspond to the findings
 published as [NR-2026-001](https://nullrabbit.ai) (Agave RPC architectural
 findings, 2026-05-12).
 
+The two Solana benign primitives have different fidelity classes because
+they observe different workloads through different capture paths.
+`solana_BENIGN_organic_rpc` is RPC-client traffic against the validator
+(JSON-RPC over TCP); the Step-11 capture sweep included a TLS-fronted
+variant where nginx terminates TLS in front of the validator, enabling
+the pre-term TLS pcap modality. `solana_BENIGN_validator_passive` is
+passive consensus-layer observation (validator running idle, no RPC
+clients); no TLS-fronting capture path was run for this workload, so the
+`lab` variant is the only one available.
+
 **Sui (9 bundles)**
 
-| Primitive | Family | Bundles | Fidelity | Coverage |
-|---|---|---|---|---|
-| `sui_F10_multi_get_objects_amp` | response_amp | 3 | lab-tls-fronted | 3 postures |
-| `sui_F14_devinspect_tokio_wedge` | compute_amp | 3 | lab-tls-fronted | 3 postures |
-| `sui_BENIGN_passive_fullnode` | benign | 1 | lab | passive workload |
-| `sui_BENIGN_reproducer_pipeline` | benign | 1 | lab-tls-fronted | reproducer baseline |
-| `sui_BENIGN_validator_under_load` | benign | 1 | lab | active workload |
+| Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
+|---|---|---|---|---|---|
+| `sui_F10_multi_get_objects_amp` | response_amp | 3 | lab-tls-fronted | pre-term TLS | 3 postures |
+| `sui_F14_devinspect_tokio_wedge` | compute_amp | 3 | lab-tls-fronted | pre-term TLS | 3 postures |
+| `sui_BENIGN_passive_fullnode` | benign | 1 | lab | none | passive workload |
+| `sui_BENIGN_reproducer_pipeline` | benign | 1 | lab-tls-fronted | pre-term TLS | reproducer baseline |
+| `sui_BENIGN_validator_under_load` | benign | 1 | lab | none | active workload |
 
 Posture variations capture distinct attack shapes against the same primitive
 (saturating throughput, low-volume, distributed-source, mimicry of organic
@@ -157,7 +174,7 @@ hashed end-to-end.
 
 The full archived corpus (corpus_v1.0 through corpus_v1.10) contains
 thousands of bundles across additional primitives, families, and fidelity
-classes. This release is a curated thirty-bundle subset selected to
+classes. This release is a curated thirty-one-bundle subset selected to
 demonstrate format coverage and provide training material for external
 researchers, with the rest of the corpus retained as the proprietary
 training surface for NullRabbit's production models.
@@ -287,9 +304,11 @@ NullRabbit's specific bundles can be traced.
   author       = {NullRabbit},
   title        = {nr-bundles-public: a curated multi-modal bundle dataset for adversarial blockchain validator research},
   year         = {2026},
+  month        = may,
+  version      = {1},
   publisher    = {Hugging Face},
   url          = {https://huggingface.co/datasets/NullRabbit/nr-bundles-public},
-  note         = {Format specified by nr-bundle-spec v0.1.0 (https://github.com/NullRabbitLabs/nr-bundle-spec).}
+  note         = {Format specified by nr-bundle-spec v0.1.0 (https://github.com/NullRabbitLabs/nr-bundle-spec).},
 }
 ```
 
