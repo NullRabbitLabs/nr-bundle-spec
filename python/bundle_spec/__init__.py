@@ -47,7 +47,7 @@ from bundle_spec.primitive_v1 import (
 )
 from bundle_spec.taxonomy import FAMILY_DEFINITIONS, FamilyId
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
     "BUNDLE_VERSION",

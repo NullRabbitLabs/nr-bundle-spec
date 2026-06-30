@@ -53,19 +53,19 @@ Full schema: [`nr-bundle-spec` v0.1.0](https://github.com/NullRabbitLabs/nr-bund
 
 Bundles are classified by **family**, defined by attack mechanism rather than by chain. This is what makes cross-chain training claims tractable: a model trained on Sui bundles for family X can generalise to Solana bundles in family X because the format and the mechanism are the same.
 
-The full taxonomy defines ten families. Seven are populated in this release:
+These are **validator / node-software** vulnerability classes only — on-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines eleven families (ten attack classes plus `benign`). Seven are populated in this release:
 
 | Family | Mechanism |
 |---|---|
 | `response_amp` | Asymmetric output:input byte ratio |
-| `compute_amp` | Asymmetric work:request CPU/memory ratio |
+| `compute_amp` | Asymmetric work:request CPU ratio |
 | `rate_limiter_bypass` | Behaviour conformant with rate limits but resource-exhausting |
 | `reconnaissance` | Information gathering for follow-on attacks |
 | `service_misconfig` | Exploitable default or operator configurations |
 | `auth_bypass` | Authentication/authorisation circumvention |
 | `benign` | Validator under normal workload (negative class) |
 
-Three families in the full taxonomy (`consensus_abuse`, `connection_exhaustion`, `protocol_abuse`) are not populated in this release pending measurement work and disclosure-coordination on related findings.
+Four families in the full taxonomy (`consensus_abuse`, `connection_exhaustion`, `gossip_abuse`, `memory_amp`) are not populated in this release pending measurement work and disclosure-coordination on related findings.
 
 ## What's included
 

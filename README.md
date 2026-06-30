@@ -105,7 +105,10 @@ Identity, taxonomy, time window, attack parameters, provenance.
 ```
 
 The `family_id` is a **chain-agnostic** vulnerability-class label
-(11 values: 10 attack families + benign). The `primitive_id` is the
+(11 values: 10 attack families + benign) — **validator / node-software
+classes only**; on-chain contract / DeFi-economic findings are a
+separate out-of-scope namespace (cross-mapped in the VII
+`ledger/family_map.csv`). The `primitive_id` is the
 **chain-specific** implementation. This two-level taxonomy is the
 load-bearing decomposition for cross-chain holdout.
 

@@ -28,6 +28,14 @@ Add a new family only when a primitive exists that doesn't fit any
 current family, OR when the family represents a pre-defined
 threat-model slot whose population is intentionally deferred.
 
+``family_id`` is the **validator / node-software** vulnerability-class
+vocabulary. On-chain contract / protocol / DeFi-economic findings (AMM
+value-extraction, oracle / TWAP manipulation, liquidation, governance
+capture, bridge-*contract* message abuse, ERC-4626 / reentrancy logic)
+are **out of scope** — a separate DeFi-economic namespace, never
+``family_id`` values. The VII ``ledger/family_map.csv`` is the
+authoritative cross-map.
+
 If a family name changes, bump ``BUNDLE_VERSION`` — it's a breaking
 contract change for every bundle in the corpus.
 """

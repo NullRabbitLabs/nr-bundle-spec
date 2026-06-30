@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] — 2026-06-30
+
+### Clarified
+
+- **`family_id` scope boundary** (`python/bundle_spec/taxonomy.py` docstring + `README.md`): documented that `family_id` is the **validator / node-software** vulnerability-class vocabulary, and that on-chain contract / DeFi-economic findings (AMM value-extraction, oracle/TWAP manipulation, liquidation, governance capture, bridge-contract message abuse, ERC-4626/reentrancy logic) are **out of scope** — a separate DeFi-economic namespace, never `family_id` values, cross-mapped in the VII `ledger/family_map.csv`. Records the canonical-vocabulary ratification (the 11-value `FamilyId` enum, unchanged). **No enum/wire change** — `BUNDLE_VERSION` unchanged; doc-only patch.
+
 ## [0.1.1] — 2026-05-13
 
 ### Clarified

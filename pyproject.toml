@@ -1,6 +1,6 @@
 [project]
 name = "bundle-spec"
-version = "0.1.1"
+version = "0.1.2"
 description = "Bundle v1 — canonical multi-modal capture format for adversarial blockchain validator research."
 authors = [{ name = "NullRabbit", email = "simon@nullrabbit.ai" }]
 readme = "README.md"
