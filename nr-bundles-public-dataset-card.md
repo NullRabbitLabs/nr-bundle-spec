@@ -18,7 +18,7 @@ size_categories:
 
 # nr-bundles-public
 
-A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Thirty-one bundles across two chains (Sui, Solana), seven vulnerability families, and ten attack primitives. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
+A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Thirty-one bundles across two chains (Sui, Solana), seven populated families (of eleven in the taxonomy), and ten attack primitives. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
 
 ## What this dataset is
 
@@ -51,7 +51,7 @@ Full schema: [`nr-bundle-spec` v0.1.0](https://github.com/NullRabbitLabs/nr-bund
 
 ## Family taxonomy
 
-Bundles are classified by **family**, defined by attack mechanism rather than by chain. This is what makes cross-chain training claims tractable: a model trained on Sui bundles for family X can generalise to Solana bundles in family X because the format and the mechanism are the same.
+Bundles are classified by **family**, defined by attack mechanism rather than by chain. Because the format and the mechanism are shared across chains, cross-chain generalisation becomes **testable**: you can hold out an entire chain and measure whether a model trained on the others recovers a family. On this corpus it does **not** transfer yet — held-out-chain family macro-F1 is **0.17 (Sui held out) / 0.35 (Solana held out)**, against a 7-class random floor of ~0.14. Cross-chain transfer is the open question the shared format lets you pose and measure, not a result this dataset demonstrates; closing the gap needs more chains per family, not more features.
 
 These are **validator / node-software** vulnerability classes only — on-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines eleven families (ten attack classes plus `benign`). Seven are populated in this release:
 
@@ -79,7 +79,7 @@ The `Pcap modality` column below specifies which network-layer file is present o
 |---|---|---|---|---|---|
 | `SOL_F10_multi_get_accounts_amp` | response_amp | 4 | lab-tls-fronted | pre-term TLS | 4 postures |
 | `SOL_F14_simulate_transaction_sync_wedge` | compute_amp | 4 | lab-tls-fronted | pre-term TLS | 4 postures |
-| `SOL_P07_get_program_accounts_filter_miss` | rate_limiter_bypass | 5 | lab | none | 5 postures |
+| `SOL_P07_get_program_accounts_filter_miss` | compute_amp | 5 | lab | none | 5 postures |
 | `SOL_RC_nmap_slow` | reconnaissance | 1 | lab | none | saturating posture |
 | `SOL_MC_grafana_anon` | service_misconfig | 1 | lab | none | saturating posture |
 | `SOL_MC_ssh_pwauth` | service_misconfig | 1 | lab | none | saturating posture |
@@ -203,6 +203,6 @@ Related:
 
 ## Contact
 
-Research enquiries: simon@nullrabbit.ai
+Research enquiries: security@nullrabbit.ai
 
 Format extensions, schema feedback, or bundles produced by external researchers against the open spec — open an issue at `nr-bundle-spec`.
