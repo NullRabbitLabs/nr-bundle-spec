@@ -15,23 +15,30 @@ This repository contains the **canonical normative specification**
 
 ```
 <corpus_id>/
-├── manifest.json       — BundleManifest (Pydantic-validated)
-├── packets.pcap        — packet capture, snaplen-256 by default
-├── host.parquet        — host telemetry time-series
-├── app.parquet         — application metric scrape time-series
-├── protocol.parquet    — consensus / protocol signal time-series
-└── responses.parquet   — per-request response semantics
+├── manifest.json       - BundleManifest (Pydantic-validated)
+├── packets.pcap        - packet capture, snaplen-256 by default
+├── host.parquet        - host telemetry time-series
+├── app.parquet         - application metric scrape time-series
+├── protocol.parquet    - consensus / protocol signal time-series
+└── responses.parquet   - per-request response semantics
 ```
 
 License: **MIT**. The format is intended to be adopted on third-party
-data without coordination — a researcher can produce bundles against
+data without coordination. A researcher can produce bundles against
 their own infrastructure, train against them, and publish results
 citing the format. Adoption is the point.
+
+## Adopting the standard
+
+- [Adoption guide](docs/adoption-guide.md): how to classify a validator-integrity
+  finding into the eleven-family vocabulary.
+- [Methodology](docs/methodology.md): how the Validator Integrity Index is built,
+  and what it does and does not yet claim.
 
 ## Why a format?
 
 Adversarial research on blockchain infrastructure has historically
-been one-off — each project builds its own capture pipeline, its own
+been one-off. Each project builds its own capture pipeline, its own
 labelling conventions, its own evaluation methodology. That makes
 results incomparable.
 
@@ -105,8 +112,8 @@ Identity, taxonomy, time window, attack parameters, provenance.
 ```
 
 The `family_id` is a **chain-agnostic** vulnerability-class label
-(11 values: 10 attack families + benign) — **validator / node-software
-classes only**; on-chain contract / DeFi-economic findings are a
+(11 values: 10 attack families + benign), covering **validator / node-software
+classes only**. On-chain contract / DeFi-economic findings are a
 separate out-of-scope namespace (cross-mapped in the VII
 `ledger/family_map.csv`). The `primitive_id` is the
 **chain-specific** implementation. This two-level taxonomy is the
@@ -114,7 +121,7 @@ load-bearing decomposition for cross-chain holdout.
 
 ### packets.pcap
 
-Raw packet capture. Default snaplen 256 bytes (TCP/IP headers only —
+Raw packet capture. Default snaplen 256 bytes (TCP/IP headers only, so
 no payload bytes leak). Producers can use larger snaplens when they
 control the privacy posture.
 
@@ -134,7 +141,7 @@ All four files share a monotonic `t_ns` column (nanoseconds since
 
 Schemas are stable; new columns require a `BUNDLE_VERSION` bump.
 
-## Quick start — Python
+## Quick start: Python
 
 ```bash
 pip install bundle-spec
@@ -160,7 +167,7 @@ table = pq.read_table("crp_abc123/responses.parquet")
 assert table.schema.equals(responses_schema())  # or a superset, additive
 ```
 
-## Quick start — Rust
+## Quick start: Rust
 
 ```toml
 [dependencies]
@@ -180,7 +187,7 @@ println!("{} {} {:?}", m.family_id, m.primitive_id, m.ground_truth_label);
 
 See `python/bundle_spec/bundle_v1.py` (Pydantic models with
 docstrings) and `schema/bundle_v1.schema.json` (generated). Both are
-the same content in different forms — the Pydantic model is
+the same content in different forms. The Pydantic model is
 canonical.
 
 Required structured-enum fields:
@@ -213,7 +220,7 @@ must be byte-for-byte equivalent. CI runs
 `tools/compare_arrow_schemas.py` to check.
 
 The `genome_id` canonicalisation (sorted-key JSON, SHA-256, first 16
-hex chars) is also pinned by a cross-language determinism test — a
+hex chars) is also pinned by a cross-language determinism test: a
 fixed input must produce the same hex string in both languages.
 
 ## Examples
@@ -247,12 +254,12 @@ re-typing, removing) require a major bump and a new module path
 
 SemVer for `bundle-spec` (this package):
 
-- **0.1.x** — bug-fix-only patches on the current schema.
-- **0.2.0** — reserved for the upcoming `provenance.substrate` ×
+- **0.1.x**: bug-fix-only patches on the current schema.
+- **0.2.0**: reserved for the upcoming `provenance.substrate` ×
   `provenance.traffic_origin` decomposition (additive: existing
   `provenance.fidelity_class` will be derived from the new pair via
   a model validator; existing readers stay compatible).
-- **1.0.0** — deferred to first set of external citations.
+- **1.0.0**: deferred to first set of external citations.
 
 ## Reproducibility
 
@@ -277,6 +284,6 @@ network dependency.
 
 ## License
 
-MIT — see `LICENSE`. Code, schemas, and example metadata are MIT-
+MIT. See `LICENSE`. Code, schemas, and example metadata are MIT-
 licensed and free to use without restriction. The example bundle
 **data** (Parquet files, packet captures) is also MIT-licensed.

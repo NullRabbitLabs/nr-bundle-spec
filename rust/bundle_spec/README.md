@@ -1,6 +1,6 @@
-# bundle-spec — Rust reference parser
+# bundle-spec: Rust reference parser
 
-Reference Rust parser for [Bundle v1](https://github.com/NullRabbitLabs/nr-bundle-spec) —
+Reference Rust parser for [Bundle v1](https://github.com/NullRabbitLabs/nr-bundle-spec),
 the canonical multi-modal capture format for adversarial blockchain
 validator research.
 
@@ -29,16 +29,16 @@ println!("{} {:?}", manifest.primitive_id, manifest.family_id);
 
 ## What's in the crate
 
-- `bundle_spec::manifest` — `BundleManifest`, `Provenance`,
+- `bundle_spec::manifest`: `BundleManifest`, `Provenance`,
   `BundleFiles`, plus the `Posture` / `GroundTruthLabel` /
   `TrafficSource` / `FidelityClass` / `TargetAuthorisation` enums.
-- `bundle_spec::primitive` — `PrimitiveDescriptor`, `ParameterSpec`.
-- `bundle_spec::taxonomy` — `FamilyId` enum + `family_definitions()`.
-- `bundle_spec::parquet` — `Schema` constants for the four time-
+- `bundle_spec::primitive`: `PrimitiveDescriptor`, `ParameterSpec`.
+- `bundle_spec::taxonomy`: `FamilyId` enum + `family_definitions()`.
+- `bundle_spec::parquet`: `Schema` constants for the four time-
   series modalities + the optional `vectors` slot.
-- `bundle_spec::genome_id` — `compute_genome_id` helper, byte-
+- `bundle_spec::genome_id`: `compute_genome_id` helper, byte-
   identical with the Python reference parser (pinned by tests).
-- `bundle_spec::validation` — `validate_manifest_json` /
+- `bundle_spec::validation`: `validate_manifest_json` /
   `validate_primitive_json` for structural JSON Schema validation
   against the embedded schema artefacts.
 
@@ -58,4 +58,4 @@ on the load-bearing surfaces:
 
 ## License
 
-MIT — see the repo's top-level `LICENSE`.
+MIT. See the repo's top-level `LICENSE`.
