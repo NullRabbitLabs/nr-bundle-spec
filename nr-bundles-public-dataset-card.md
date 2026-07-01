@@ -22,7 +22,7 @@ A curated, multi-modal dataset of blockchain validator infrastructure under atta
 
 ## What this dataset is
 
-Most security datasets on the Hub are either application-layer (smart contract vulnerabilities, exploit code snippets) or generic (enterprise network traffic, malware signatures). The infrastructure layer where blockchain validators actually run — the RPC surface, the gossip layer, the consensus daemon, the indexer — has no shared, ML-trainable representation. This dataset is the first public sample of one.
+Most security datasets on the Hub are either application-layer (smart contract vulnerabilities, exploit code snippets) or generic (enterprise network traffic, malware signatures). The infrastructure layer where blockchain validators actually run (the RPC surface, the gossip layer, the consensus daemon, the indexer) has no shared, ML-trainable representation. This dataset is the first public sample of one.
 
 Each entry is a **bundle**: a multi-modal observation of validator infrastructure under a single workload. Bundles capture network packets, host telemetry, application metrics, and observed responses simultaneously, under a chain-agnostic schema. The format is open and specified at [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec) (MIT-licensed). Anyone can produce v1 bundles for any chain.
 
@@ -43,7 +43,7 @@ Each bundle is a directory containing a manifest plus up to six modality files. 
 | `responses.parquet` | RPC/API response metadata (no bodies) | Bundles where the validator served RPC traffic during the capture window (manifest `responses_parquet=True`); **absent or zero-rows for passive-workload benigns** (`sui_BENIGN_passive_fullnode`, `solana_BENIGN_validator_passive`) |
 | `vectors.parquet` | Computed feature vectors derived from the above | **Not populated in this release.** Reserved schema slot; consumers should derive feature vectors at inference time using the bundle-spec reference parser plus their own feature pipeline |
 
-The manifest pins `primitive_id`, `family_id`, `traffic_source`, `fidelity_class`, `target_authorisation`, and provenance hashes for every file in the bundle. The schema is chain-agnostic — no field assumes a specific blockchain. The `BundleFiles` block (`packets_pcap`, `host_parquet`, `app_parquet`, `protocol_parquet`, `responses_parquet`, `vectors_parquet`) is the authoritative present/absent contract; readers should check the manifest before reading each modality file.
+The manifest pins `primitive_id`, `family_id`, `traffic_source`, `fidelity_class`, `target_authorisation`, and provenance hashes for every file in the bundle. The schema is chain-agnostic: no field assumes a specific blockchain. The `BundleFiles` block (`packets_pcap`, `host_parquet`, `app_parquet`, `protocol_parquet`, `responses_parquet`, `vectors_parquet`) is the authoritative present/absent contract; readers should check the manifest before reading each modality file.
 
 Bundles in this release carry one of two `fidelity_class` values: `lab` (controlled reproducer environment, no TLS termination) and `lab-tls-fronted` (controlled reproducer with an nginx TLS-termination front; pre-term TLS pcap is retained, post-term cleartext pcap is dropped). All bundles have `target_authorisation: self-owned` (every validator targeted was operated by NullRabbit).
 
@@ -51,9 +51,9 @@ Full schema: [`nr-bundle-spec` v0.1.0](https://github.com/NullRabbitLabs/nr-bund
 
 ## Family taxonomy
 
-Bundles are classified by **family**, defined by attack mechanism rather than by chain. Because the format and the mechanism are shared across chains, cross-chain generalisation becomes **testable**: you can hold out an entire chain and measure whether a model trained on the others recovers a family. On this corpus it does **not** transfer yet — held-out-chain family macro-F1 is **0.17 (Sui held out) / 0.35 (Solana held out)**, against a 7-class random floor of ~0.14. Cross-chain transfer is the open question the shared format lets you pose and measure, not a result this dataset demonstrates; closing the gap needs more chains per family, not more features.
+Bundles are classified by **family**, defined by attack mechanism rather than by chain. Because the format and the mechanism are shared across chains, cross-chain generalisation becomes **testable**: you can hold out an entire chain and measure whether a model trained on the others recovers a family. On this corpus it does **not** transfer yet: held-out-chain family macro-F1 is **0.17 (Sui held out) / 0.35 (Solana held out)**, against a 7-class random floor of ~0.14. Cross-chain transfer is the open question the shared format lets you pose and measure, not a result this dataset demonstrates; closing the gap needs more chains per family, not more features.
 
-These are **validator / node-software** vulnerability classes only — on-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines eleven families (ten attack classes plus `benign`). Seven are populated in this release:
+These are **validator / node-software** vulnerability classes only. On-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines eleven families (ten attack classes plus `benign`). Seven are populated in this release:
 
 | Family | Mechanism |
 |---|---|
@@ -161,13 +161,13 @@ for bundle_dir in sorted(Path(local).glob("crp_*")):
         (bundle_dir / "manifest.json").read_text()
     )
     print(manifest.primitive_id, manifest.family_id, manifest.fidelity_class)
-    # Each modality is a Parquet file — read with pyarrow / pandas / polars
+    # Each modality is a Parquet file, read with pyarrow / pandas / polars
     # as the modality demands. See nr-bundle-spec for per-modality schemas.
     # Check manifest.files.<modality_parquet> before reading; bundles do
     # not contain modalities that were not captured during the workload.
 ```
 
-`datasets.load_dataset("NullRabbit/nr-bundles-public")` does **not** work on this dataset — HF's auto-loader assumes a single tabular schema, which doesn't match the multi-modal bundle layout. Use `snapshot_download` + the bundle-spec parsers as shown above.
+`datasets.load_dataset("NullRabbit/nr-bundles-public")` does **not** work on this dataset: HF's auto-loader assumes a single tabular schema, which doesn't match the multi-modal bundle layout. Use `snapshot_download` + the bundle-spec parsers as shown above.
 
 For schema, validation, and reference parsers (Python + Rust), see [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec). A validator CLI is available at `tools/validate_bundle.py`.
 
@@ -205,4 +205,4 @@ Related:
 
 Research enquiries: security@nullrabbit.ai
 
-Format extensions, schema feedback, or bundles produced by external researchers against the open spec — open an issue at `nr-bundle-spec`.
+Format extensions, schema feedback, or bundles produced by external researchers against the open spec, open an issue at `nr-bundle-spec`.

@@ -16,18 +16,18 @@ attack/benign × cross-chain × mechanism design space.
 
 ```
 example_<name>/
-├── manifest.json                 — BundleManifest (schema-validated)
-├── pcap_pre_termination.pcap     — pre-term TLS pcap (no cleartext leak)
-├── host.parquet                  — host telemetry
-├── app.parquet                   — Prometheus scrape (often empty for these
+├── manifest.json                 - BundleManifest (schema-validated)
+├── pcap_pre_termination.pcap     - pre-term TLS pcap (no cleartext leak)
+├── host.parquet                  - host telemetry
+├── app.parquet                   - Prometheus scrape (often empty for these
 │                                    bundles; the scrape didn't run during
 │                                    the capture window)
-├── protocol.parquet              — chain-protocol signals
-└── responses.parquet             — per-request semantics
+├── protocol.parquet              - chain-protocol signals
+└── responses.parquet             - per-request semantics
 ```
 
 `packets.pcap` (the post-term cleartext loopback) has been **stripped**
-from each example — it would contain HTTP/JSON-RPC bodies, which we
+from each example, since it would contain HTTP/JSON-RPC bodies, which we
 deliberately don't publish in this reference set. The manifest
 records this via `files.packets_pcap=False`.
 
@@ -36,7 +36,7 @@ The pre-term TLS pcap is preserved. Per a full content audit
 contain only:
 - TLS handshake records (encrypted payload after EncryptedExtensions)
 - Loopback IP addresses (127.0.0.1, 127.0.0.2)
-- ALPN values (h2 / http/1.1 only — no surprising entries)
+- ALPN values (h2 / http/1.1 only, no surprising entries)
 
 No SNI (clients use IP-only target URLs), no plaintext JSON-RPC
 tokens, no customer/engagement metadata, no filesystem paths.
@@ -45,11 +45,11 @@ tokens, no customer/engagement metadata, no filesystem paths.
 
 All five bundles share the same provenance posture:
 
-- `target_authorisation`: `self-owned` — captured against operator-
+- `target_authorisation`: `self-owned`, captured against operator-
   owned localnet validators.
 - `target_env`: `localnet-sui-multinode4` (Sui side) or
   `localnet-solana-test-validator-v2.2.16` (Solana side).
-- `fidelity_class`: `lab-tls-fronted` — full reproducer producing
+- `fidelity_class`: `lab-tls-fronted`, a full reproducer producing
   genuine traffic against a TLS-terminating nginx in front of a
   localnet validator, captured at the pre-term wire vantage.
 
@@ -77,7 +77,7 @@ println!("{} {:?}", m.primitive_id, m.ground_truth_label);
 
 ## License
 
-The example bundles are MIT-licensed alongside the spec — see the
+The example bundles are MIT-licensed alongside the spec. See the
 top-level `LICENSE`. Use freely. The data was produced entirely on
 operator-owned localnet infrastructure with no third-party traffic
 involved.
