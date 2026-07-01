@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2026-07-01
+
+### Added
+
+- **`provenance.source_class`** (`python/bundle_spec/bundle_v1.py`, `README.md`, `schema/bundle_v1.schema.json`): an optional attack-bundle sourcing tier. `public-cve-replication` marks a bundle that faithfully reproduces an EXTERNAL public disclosure (a CVE, GHSA, named third-party audit, or published post-mortem, referenced in a `provenance.public_source` URL) and is therefore publishable; `original` marks the recorder's own measurement of a vendor-acknowledged abuse for which no external CVE exists (an ecosystem survey finding). Null for benign / unclassified bundles. Lets dataset curators cut a publishable, externally-sourced-only subset without inspecting each bundle. **Additive optional field** (the model already accepted extras via `extra="allow"`): no `BUNDLE_VERSION` change, existing bundles stay valid. Schema regenerated; all 103 tests pass.
+
 ## [0.1.2] - 2026-06-30
 
 ### Clarified

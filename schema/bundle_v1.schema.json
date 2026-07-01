@@ -1,7 +1,7 @@
 {
   "$defs": {
     "BundleFiles": {
-      "description": "Which on-disk files the bundle actually contains.\n\n``True`` = file is present and schema-conformant. ``False`` =\nfile was intentionally skipped.\n\n``vectors_parquet`` is a sixth modality slot reserved for\nbehavioural / fingerprint vectors that don't fit the other four\nmodalities (e.g. timing-resonance signatures, derived\nbehavioural embeddings). Currently unpopulated in the v0.1.0\nreference corpus; the schema slot is reserved.",
+      "description": "Which on-disk modalities the bundle considers schema-conformant.\n\nSemantics (forward-only contract):\n\n- ``True``: the named file MUST be present in the bundle directory\n  and is conformant with the modality's schema. Consumers should\n  read it.\n- ``False``: the modality is NOT considered conformant for this\n  bundle. The file MAY OR MAY NOT exist on disk; if it does, it is\n  typically an empty placeholder (e.g. zero-row Parquet) or a\n  non-conformant capture that the producer didn't include in the\n  bundle's effective modality set. Consumers SHOULD NOT read it.\n\nThis asymmetric semantic exists because the reference example\nbundles (and many producers' captures) ship empty placeholders for\nmodalities that didn't capture during a workload \u2014 for instance a\npassive-fullnode benign bundle has no RPC traffic to serve, so\n``responses.parquet`` exists as an empty placeholder but\n``responses_parquet=False``. Validators should enforce the forward\ndirection only (``True`` \u21d2 file present); reverse-checking\n``False`` \u21d2 file absent breaks against the existing example\nconvention. The validator at ``tools/validate_bundle.py``\nimplements the forward-only check.\n\n``vectors_parquet`` is a sixth modality slot reserved for\nbehavioural / fingerprint vectors that don't fit the other four\nmodalities (e.g. timing-resonance signatures, derived behavioural\nembeddings). Currently unpopulated in the v0.1.0 reference corpus;\nthe schema slot is reserved.",
       "properties": {
         "app_parquet": {
           "default": false,
@@ -133,6 +133,23 @@
           "default": null,
           "description": "Optional. Path to a secondary pcap captured at the pre-termination wire vantage when the bundle was captured behind a TLS-terminating proxy (fidelity_class=lab-tls-fronted dual-vantage capture). When set, the primary pcap.pcap is the post-termination loopback (cleartext, full feature surface) and this field references the pre-termination wire (TLS frames, cipher-agnostic feature surface). Null for single-vantage captures.",
           "title": "Pcap Path Pre Termination"
+        },
+        "source_class": {
+          "anyOf": [
+            {
+              "enum": [
+                "public-cve-replication",
+                "original"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional sourcing tier for an attack bundle. 'public-cve-replication': the bundle faithfully reproduces an EXTERNAL public disclosure (a CVE, GHSA, named third-party audit, or published post-mortem, referenced in a provenance.public_source URL) and is therefore publishable. 'original': the recorder's own measurement of a vendor-acknowledged abuse for which no external CVE exists (an ecosystem survey finding). Null for benign bundles and when unclassified. Lets dataset curators cut a publishable, externally-sourced-only subset without inspecting each bundle.",
+          "title": "Source Class"
         },
         "target_authorisation": {
           "$ref": "#/$defs/TargetAuthorisation",

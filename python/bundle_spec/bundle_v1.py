@@ -256,6 +256,23 @@ class Provenance(BaseModel):
         ),
     )
 
+    source_class: Literal["public-cve-replication", "original"] | None = Field(
+        default=None,
+        description=(
+            "Optional sourcing tier for an attack bundle. "
+            "'public-cve-replication': the bundle faithfully "
+            "reproduces an EXTERNAL public disclosure (a CVE, GHSA, "
+            "named third-party audit, or published post-mortem, "
+            "referenced in a provenance.public_source URL) and is "
+            "therefore publishable. 'original': the recorder's own "
+            "measurement of a vendor-acknowledged abuse for which no "
+            "external CVE exists (an ecosystem survey finding). Null "
+            "for benign bundles and when unclassified. Lets dataset "
+            "curators cut a publishable, externally-sourced-only "
+            "subset without inspecting each bundle."
+        ),
+    )
+
     pcap_path_pre_termination: str | None = Field(
         default=None,
         description=(

@@ -98,6 +98,7 @@ Identity, taxonomy, time window, attack parameters, provenance.
     "traffic_source": "reproducer-attack",
     "fidelity_class": "lab",
     "target_authorisation": "self-owned",
+    "source_class": "public-cve-replication",
     "tooling": { … }
   },
   "files": {
@@ -199,6 +200,12 @@ Required structured-enum fields:
 - `provenance.fidelity_class`: see `FidelityClass` (6 values).
 - `provenance.target_authorisation`: see `TargetAuthorisation`
   (4 values).
+- `provenance.source_class` (optional): `public-cve-replication`
+  (reproduces an external public disclosure cited in
+  `provenance.public_source`, so it is publishable) or `original`
+  (the recorder's own measurement of a vendor-acknowledged abuse
+  with no external CVE). Null for benign / unclassified. Lets a
+  curator cut a publishable, externally-sourced-only subset.
 
 ## Schema regeneration
 
