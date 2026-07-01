@@ -24,9 +24,16 @@ This repository contains the **canonical normative specification**
 ```
 
 License: **MIT**. The format is intended to be adopted on third-party
-data without coordination — a researcher can produce bundles against
+data without coordination. A researcher can produce bundles against
 their own infrastructure, train against them, and publish results
 citing the format. Adoption is the point.
+
+## Adopting the standard
+
+- [Adoption guide](docs/adoption-guide.md): how to classify a validator-integrity
+  finding into the eleven-family vocabulary.
+- [Methodology](docs/methodology.md): how the Validator Integrity Index is built,
+  and what it does and does not yet claim.
 
 ## Why a format?
 
