@@ -11,6 +11,7 @@ tags:
   - adversarial-robustness
   - solana
   - sui
+  - iota
 pretty_name: nr-bundles-public
 size_categories:
   - n<1K
@@ -18,7 +19,7 @@ size_categories:
 
 # nr-bundles-public
 
-A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Thirty-one bundles across two chains (Sui, Solana), seven populated families (of eleven in the taxonomy), and ten attack primitives. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
+A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Thirty-four bundles across three chains (Sui, Solana, IOTA), nine populated families (of eleven in the taxonomy), and thirteen attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
 
 ## What this dataset is
 
@@ -26,7 +27,7 @@ Most security datasets on the Hub are either application-layer (smart contract v
 
 Each entry is a **bundle**: a multi-modal observation of validator infrastructure under a single workload. Bundles capture network packets, host telemetry, application metrics, and observed responses simultaneously, under a chain-agnostic schema. The format is open and specified at [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec) (MIT-licensed). Anyone can produce v1 bundles for any chain.
 
-This release publishes thirty-one bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
+This release publishes thirty-four bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
 
 ## Bundle structure
 
@@ -53,7 +54,7 @@ Full schema: [`nr-bundle-spec` v0.1.0](https://github.com/NullRabbitLabs/nr-bund
 
 Bundles are classified by **family**, defined by attack mechanism rather than by chain. Because the format and the mechanism are shared across chains, cross-chain generalisation becomes **testable**: you can hold out an entire chain and measure whether a model trained on the others recovers a family. On this corpus it does **not** transfer yet: held-out-chain family macro-F1 is **0.17 (Sui held out) / 0.35 (Solana held out)**, against a 7-class random floor of ~0.14. Cross-chain transfer is the open question the shared format lets you pose and measure, not a result this dataset demonstrates; closing the gap needs more chains per family, not more features.
 
-These are **validator / node-software** vulnerability classes only. On-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines eleven families (ten attack classes plus `benign`). Seven are populated in this release:
+These are **validator / node-software** vulnerability classes only. On-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines eleven families (ten attack classes plus `benign`). Nine are populated in this release:
 
 | Family | Mechanism |
 |---|---|
@@ -63,13 +64,15 @@ These are **validator / node-software** vulnerability classes only. On-chain con
 | `reconnaissance` | Information gathering for follow-on attacks |
 | `service_misconfig` | Exploitable default or operator configurations |
 | `auth_bypass` | Authentication/authorisation circumvention |
+| `connection_exhaustion` | Per-connection/subscription resource leak, not released on disconnect |
+| `memory_amp` | Unbounded accumulation of process memory under attacker input |
 | `benign` | Validator under normal workload (negative class) |
 
-Four families in the full taxonomy (`consensus_abuse`, `connection_exhaustion`, `gossip_abuse`, `memory_amp`) are not populated in this release pending measurement work and disclosure-coordination on related findings.
+Two families in the full taxonomy (`consensus_abuse`, `gossip_abuse`) are not populated in this release pending measurement work and disclosure-coordination on related findings.
 
 ## What's included
 
-Thirty-one bundles total. Twenty-four attack bundles, seven benign. Twenty-two Solana, nine Sui. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), fourteen at `fidelity_class: lab` (no TLS termination; raw pcap dropped).
+Thirty-four bundles total. Twenty-seven attack bundles, seven benign. Twenty-two Solana, eleven Sui, one IOTA. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), seventeen at `fidelity_class: lab` (no TLS termination; raw pcap dropped).
 
 The `Pcap modality` column below specifies which network-layer file is present on disk per bundle: `pre-term TLS` means `pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP headers visible); `none` means the raw `packets.pcap` was dropped and no pre-term variant exists (`BundleFiles.packets_pcap=False` in the manifest).
 
@@ -92,15 +95,25 @@ The SOL_F10 / SOL_F14 / SOL_P07 primitives correspond to the findings published 
 
 The two Solana benign primitives have different fidelity classes because they observe different workloads through different capture paths. `solana_BENIGN_organic_rpc` is RPC-client traffic against the validator (JSON-RPC over TCP); the Step-11 capture sweep included a TLS-fronted variant where nginx terminates TLS in front of the validator, enabling the pre-term TLS pcap modality. `solana_BENIGN_validator_passive` is passive consensus-layer observation (validator running idle, no RPC clients); no TLS-fronting capture path was run for this workload, so the `lab` variant is the only one available.
 
-**Sui (9 bundles)**
+**Sui (11 bundles)**
 
 | Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
 |---|---|---|---|---|---|
 | `sui_F10_multi_get_objects_amp` | response_amp | 3 | lab-tls-fronted | pre-term TLS | 3 postures |
 | `sui_F14_devinspect_tokio_wedge` | compute_amp | 3 | lab-tls-fronted | pre-term TLS | 3 postures |
+| `sui_f10_multiget_response_amp` | response_amp | 1 | lab | none | attack; current-namespace capture of the F10 multiGetObjects egress amp (cf. legacy `sui_F10_multi_get_objects_amp` above) |
+| `sui_subscription_permit_leak` | connection_exhaustion | 1 | lab | none | attack; subscription permit + streamer-map leak |
 | `sui_BENIGN_passive_fullnode` | benign | 1 | lab | none | passive workload |
 | `sui_BENIGN_reproducer_pipeline` | benign | 1 | lab-tls-fronted | pre-term TLS | reproducer baseline |
 | `sui_BENIGN_validator_under_load` | benign | 1 | lab | none | active workload |
+
+**IOTA (1 bundle)**
+
+| Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
+|---|---|---|---|---|---|
+| `iota_grpc_h2_multiplex_oom` | memory_amp | 1 | lab | none | attack; unbounded HTTP/2 concurrent-stream OOM on the public gRPC surface |
+
+The three 2026-07-02 additions (`sui_f10_multiget_response_amp`, `sui_subscription_permit_leak`, `iota_grpc_h2_multiplex_oom`) are NullRabbit original-research findings (`source_class: original`, `ground_truth_label: attack`), each also the subject of a published operator advisory (NR-2026-004, NR-2026-005, NR-2026-003 respectively). They add IOTA as a third chain and populate the `connection_exhaustion` and `memory_amp` families.
 
 Posture variations capture distinct attack shapes against the same primitive (saturating throughput, low-volume, distributed-source, mimicry of organic traffic, historical-CVE patterns). Bundles within a primitive are intentionally non-identical so the dataset surfaces the variance the format is designed to represent.
 
@@ -132,11 +145,11 @@ This dataset is intended for:
 ## Limitations
 
 - **Lab fidelity only.** All bundles in this release were captured in a controlled reproducer environment, not on mainnet or testnet. The capture pipeline has known fidelity envelopes; production-deployment generalisation is an open empirical question.
-- **Two chains.** Sui and Solana only. Cross-chain claims in published work apply specifically to this two-chain corpus; broader generalisation (Cosmos, Ethereum, Aptos, others) is queued for subsequent corpus versions.
-- **Curated subset.** Thirty-one bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
+- **Three chains.** Sui, Solana, and IOTA. Cross-chain claims in published work apply specifically to this corpus; broader generalisation (Cosmos, Ethereum, Aptos, others) is queued for subsequent corpus versions.
+- **Curated subset.** Thirty-four bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
 - **Raw `packets.pcap` is dropped from every bundle in this release.** Two policies apply per fidelity class:
   - `lab-tls-fronted` bundles (17): post-termination cleartext `packets.pcap` is dropped via `tools/strip_pcap.py` (from `nr-bundle-spec`); the pre-termination TLS pcap (`pcap_pre_termination.pcap`) is retained. TLS frames are encrypted; only IP/TCP headers are visible at the pre-term wire vantage.
-  - `lab` bundles (14): no pre-term variant exists; the raw `packets.pcap` is dropped and `BundleFiles.packets_pcap=False` is set in the manifest. The remaining Parquet modalities (host plus whichever of app, protocol, responses were captured for the workload) stay intact.
+  - `lab` bundles (17): no pre-term variant exists; the raw `packets.pcap` is dropped and `BundleFiles.packets_pcap=False` is set in the manifest. The remaining Parquet modalities (host plus whichever of app, protocol, responses were captured for the workload) stay intact.
   Future dataset versions may include a header-only stripped variant of `packets.pcap` for `lab` bundles once payload-stripping tooling has been verified.
 - **Modality presence varies by workload.** Passive-workload benigns (`sui_BENIGN_passive_fullnode`, `solana_BENIGN_validator_passive`) do not serve RPC traffic during capture; their `responses.parquet` is absent or zero-rows and `BundleFiles.responses_parquet=False` in the manifest. Consumers must check the manifest's `files` block before reading each modality. `vectors.parquet` is reserved-but-unpopulated in this release; consumers derive feature vectors at inference time.
 - **Disclosure status varies by primitive.** SOL_F10/F14/P07 are publicly disclosed per NR-2026-001. Other primitives represent methodology-class findings or are referenced in coordinated-disclosure channels with respective ecosystems.
