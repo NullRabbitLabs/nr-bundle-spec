@@ -48,7 +48,7 @@ from enum import Enum
 class FamilyId(str, Enum):
     """Chain-agnostic vulnerability-class label for a bundle.
 
-    Enumeration: 10 attack families + 1 benign. ``reconnaissance`` is
+    Enumeration: 12 attack families + 1 benign. ``reconnaissance`` is
     a deferred-population slot in v0.1.0 — the scaffolded family for
     pre-discovery and target-mapping activity (covered in upstream
     research but currently unpopulated in the public reference
@@ -65,6 +65,8 @@ class FamilyId(str, Enum):
     rate_limiter_bypass = "rate_limiter_bypass"
     service_misconfig = "service_misconfig"
     reconnaissance = "reconnaissance"
+    subscription_cpu_amp = "subscription_cpu_amp"
+    state_import_abuse = "state_import_abuse"
     benign = "benign"
 
 
@@ -126,6 +128,24 @@ FAMILY_DEFINITIONS: dict[FamilyId, str] = {
         "(which is exploitation of a discovered weakness, not the "
         "discovery itself). Currently unpopulated in the v0.1.0 "
         "reference corpus.",
+    FamilyId.subscription_cpu_amp:
+        "A subscription or streaming filter whose per-notification "
+        "server-side cost is disproportionate to the trivial cost of "
+        "subscribing. A wide or pathological filter (e.g. a match-"
+        "everything event subscription) makes every matching event drive "
+        "expensive server work, so one cheap subscribe sustains unbounded "
+        "CPU. Distinct from `compute_amp` (a single request's processing "
+        "cost) — here the amplification is per-event over a persistent "
+        "subscription, and from `connection_exhaustion` (a quota leak, "
+        "not per-event CPU).",
+    FamilyId.state_import_abuse:
+        "Abuse of a node's state / snapshot bootstrap-import path. A "
+        "malformed or oversized state artefact (snapshot, append-vec, "
+        "ledger segment) fed to the import / reconstruction pipeline "
+        "triggers a crash, panic, or resource blow-up during "
+        "deserialisation or reconstruction — before the artefact is fully "
+        "validated. The attack surface is the trust placed in a fetched "
+        "bootstrap artefact, not a live request.",
     FamilyId.benign:
         "No attack shape. Present to train the 'not malicious' decision "
         "boundary.",

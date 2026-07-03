@@ -35,6 +35,10 @@ pub enum FamilyId {
     ServiceMisconfig,
     /// Pre-discovery / target-mapping activity.
     Reconnaissance,
+    /// Subscription/streaming filter with disproportionate per-event CPU.
+    SubscriptionCpuAmp,
+    /// Abuse of the state / snapshot bootstrap-import path.
+    StateImportAbuse,
     /// No attack shape; trains the "not malicious" decision boundary.
     Benign,
 }
@@ -53,6 +57,8 @@ impl FamilyId {
             FamilyId::RateLimiterBypass => "rate_limiter_bypass",
             FamilyId::ServiceMisconfig => "service_misconfig",
             FamilyId::Reconnaissance => "reconnaissance",
+            FamilyId::SubscriptionCpuAmp => "subscription_cpu_amp",
+            FamilyId::StateImportAbuse => "state_import_abuse",
             FamilyId::Benign => "benign",
         }
     }
@@ -120,6 +126,22 @@ pub fn family_definitions() -> &'static [(FamilyId, &'static str)] {
              corpus.",
         ),
         (
+            FamilyId::SubscriptionCpuAmp,
+            "A subscription or streaming filter whose per-notification \
+             server-side cost is disproportionate to the trivial cost of \
+             subscribing. A wide filter makes every matching event drive \
+             expensive server work, so one cheap subscribe sustains \
+             unbounded CPU.",
+        ),
+        (
+            FamilyId::StateImportAbuse,
+            "Abuse of a node's state / snapshot bootstrap-import path. A \
+             malformed or oversized state artefact (snapshot, append-vec, \
+             ledger segment) fed to the import / reconstruction pipeline \
+             triggers a crash, panic, or resource blow-up during \
+             deserialisation — before the artefact is fully validated.",
+        ),
+        (
             FamilyId::Benign,
             "No attack shape. Present to train the 'not malicious' decision \
              boundary.",
@@ -145,6 +167,8 @@ mod tests {
             (FamilyId::RateLimiterBypass, "rate_limiter_bypass"),
             (FamilyId::ServiceMisconfig, "service_misconfig"),
             (FamilyId::Reconnaissance, "reconnaissance"),
+            (FamilyId::SubscriptionCpuAmp, "subscription_cpu_amp"),
+            (FamilyId::StateImportAbuse, "state_import_abuse"),
             (FamilyId::Benign, "benign"),
         ] {
             assert_eq!(serde_json::to_value(variant).unwrap(), json!(expected));
@@ -180,7 +204,7 @@ mod tests {
     #[test]
     fn family_definitions_covers_all_variants() {
         let defs = family_definitions();
-        assert_eq!(defs.len(), 11);
+        assert_eq!(defs.len(), 13);
         for variant in [
             FamilyId::ResponseAmp,
             FamilyId::ComputeAmp,
@@ -192,6 +216,8 @@ mod tests {
             FamilyId::RateLimiterBypass,
             FamilyId::ServiceMisconfig,
             FamilyId::Reconnaissance,
+            FamilyId::SubscriptionCpuAmp,
+            FamilyId::StateImportAbuse,
             FamilyId::Benign,
         ] {
             assert!(

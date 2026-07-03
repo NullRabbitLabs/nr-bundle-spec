@@ -19,7 +19,7 @@ size_categories:
 
 # nr-bundles-public
 
-A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Thirty-four bundles across three chains (Sui, Solana, IOTA), nine populated families (of eleven in the taxonomy), and thirteen attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
+A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Thirty-six bundles across three chains (Sui, Solana, IOTA), eleven populated families (of thirteen in the taxonomy), and fifteen attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
 
 ## What this dataset is
 
@@ -27,7 +27,7 @@ Most security datasets on the Hub are either application-layer (smart contract v
 
 Each entry is a **bundle**: a multi-modal observation of validator infrastructure under a single workload. Bundles capture network packets, host telemetry, application metrics, and observed responses simultaneously, under a chain-agnostic schema. The format is open and specified at [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec) (MIT-licensed). Anyone can produce v1 bundles for any chain.
 
-This release publishes thirty-four bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
+This release publishes thirty-six bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
 
 ## Bundle structure
 
@@ -48,13 +48,13 @@ The manifest pins `primitive_id`, `family_id`, `traffic_source`, `fidelity_class
 
 Bundles in this release carry one of two `fidelity_class` values: `lab` (controlled reproducer environment, no TLS termination) and `lab-tls-fronted` (controlled reproducer with an nginx TLS-termination front; pre-term TLS pcap is retained, post-term cleartext pcap is dropped). All bundles have `target_authorisation: self-owned` (every validator targeted was operated by NullRabbit).
 
-Full schema: [`nr-bundle-spec` v0.1.0](https://github.com/NullRabbitLabs/nr-bundle-spec), which defines bundle v1 format.
+Full schema: [`nr-bundle-spec` v0.2.0](https://github.com/NullRabbitLabs/nr-bundle-spec), which defines bundle v1 format.
 
 ## Family taxonomy
 
 Bundles are classified by **family**, defined by attack mechanism rather than by chain. Because the format and the mechanism are shared across chains, cross-chain generalisation becomes **testable**: you can hold out an entire chain and measure whether a model trained on the others recovers a family. On this corpus it does **not** transfer yet: held-out-chain family macro-F1 is **0.17 (Sui held out) / 0.35 (Solana held out)**, against a 7-class random floor of ~0.14. Cross-chain transfer is the open question the shared format lets you pose and measure, not a result this dataset demonstrates; closing the gap needs more chains per family, not more features.
 
-These are **validator / node-software** vulnerability classes only. On-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines eleven families (ten attack classes plus `benign`). Nine are populated in this release:
+These are **validator / node-software** vulnerability classes only. On-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines thirteen families (twelve attack classes plus `benign`). Eleven are populated in this release:
 
 | Family | Mechanism |
 |---|---|
@@ -66,21 +66,24 @@ These are **validator / node-software** vulnerability classes only. On-chain con
 | `auth_bypass` | Authentication/authorisation circumvention |
 | `connection_exhaustion` | Per-connection/subscription resource leak, not released on disconnect |
 | `memory_amp` | Unbounded accumulation of process memory under attacker input |
+| `subscription_cpu_amp` | Wide/streaming subscription with disproportionate per-event server CPU |
+| `state_import_abuse` | Malformed/oversized state artefact crashes the snapshot/bootstrap import path |
 | `benign` | Validator under normal workload (negative class) |
 
 Two families in the full taxonomy (`consensus_abuse`, `gossip_abuse`) are not populated in this release pending measurement work and disclosure-coordination on related findings.
 
 ## What's included
 
-Thirty-four bundles total. Twenty-seven attack bundles, seven benign. Twenty-two Solana, eleven Sui, one IOTA. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), seventeen at `fidelity_class: lab` (no TLS termination; raw pcap dropped).
+Thirty-six bundles total. Twenty-nine attack bundles, seven benign. Twenty-three Solana, eleven Sui, two IOTA. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), nineteen at `fidelity_class: lab` (no TLS termination; raw pcap dropped).
 
 The `Pcap modality` column below specifies which network-layer file is present on disk per bundle: `pre-term TLS` means `pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP headers visible); `none` means the raw `packets.pcap` was dropped and no pre-term variant exists (`BundleFiles.packets_pcap=False` in the manifest).
 
-**Solana (22 bundles)**
+**Solana (23 bundles)**
 
 | Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
 |---|---|---|---|---|---|
 | `SOL_F10_multi_get_accounts_amp` | response_amp | 4 | lab-tls-fronted | pre-term TLS | 4 postures |
+| `sol_snapshot_oversized_datalen_indexgen_panic` | state_import_abuse | 1 | lab | none | attack; oversized AppendVec data_len → index-gen panic on snapshot import |
 | `SOL_F14_simulate_transaction_sync_wedge` | compute_amp | 4 | lab-tls-fronted | pre-term TLS | 4 postures |
 | `SOL_P07_get_program_accounts_filter_miss` | compute_amp | 5 | lab | none | 5 postures |
 | `SOL_RC_nmap_slow` | reconnaissance | 1 | lab | none | saturating posture |
@@ -107,13 +110,16 @@ The two Solana benign primitives have different fidelity classes because they ob
 | `sui_BENIGN_reproducer_pipeline` | benign | 1 | lab-tls-fronted | pre-term TLS | reproducer baseline |
 | `sui_BENIGN_validator_under_load` | benign | 1 | lab | none | active workload |
 
-**IOTA (1 bundle)**
+**IOTA (2 bundles)**
 
 | Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
 |---|---|---|---|---|---|
 | `iota_grpc_h2_multiplex_oom` | memory_amp | 1 | lab | none | attack; unbounded HTTP/2 concurrent-stream OOM on the public gRPC surface |
+| `iota_s1_widefilter_subscribe_cpu` | subscription_cpu_amp | 1 | lab | none | attack; wide event-filter subscription → exponential per-event CPU |
 
 The three 2026-07-02 additions (`sui_f10_multiget_response_amp`, `sui_subscription_permit_leak`, `iota_grpc_h2_multiplex_oom`) are NullRabbit original-research findings (`source_class: original`, `ground_truth_label: attack`), each also the subject of a published operator advisory (NR-2026-004, NR-2026-005, NR-2026-003 respectively). They add IOTA as a third chain and populate the `connection_exhaustion` and `memory_amp` families.
+
+The two 2026-07-03 additions (`sol_snapshot_oversized_datalen_indexgen_panic`, `iota_s1_widefilter_subscribe_cpu`) populate the two families promoted into the taxonomy in [nr-bundle-spec v0.2.0](https://github.com/NullRabbitLabs/nr-bundle-spec): `state_import_abuse` (a malformed snapshot artefact that crashes the bootstrap import path) and `subscription_cpu_amp` (a wide event-filter subscription driving exponential per-event CPU).
 
 Posture variations capture distinct attack shapes against the same primitive (saturating throughput, low-volume, distributed-source, mimicry of organic traffic, historical-CVE patterns). Bundles within a primitive are intentionally non-identical so the dataset surfaces the variance the format is designed to represent.
 

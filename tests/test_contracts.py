@@ -605,14 +605,16 @@ class TestFamilyTaxonomy:
         # response_amp, compute_amp, memory_amp, connection_exhaustion,
         # consensus_abuse, gossip_abuse, auth_bypass, rate_limiter_bypass,
         # service_misconfig, reconnaissance, benign.
-        # 10 attack + 1 benign. `reconnaissance` was added in Step 5.7
+        # 12 attack + 1 benign. `reconnaissance` was added in Step 5.7
         # as an intentionally unpopulated scaffold — see BACKLOG.md.
-        assert len(list(FamilyId)) == 11
+        # `subscription_cpu_amp` + `state_import_abuse` promoted in v0.2.0.
+        assert len(list(FamilyId)) == 13
         assert {f.value for f in FamilyId} == {
             "response_amp", "compute_amp", "memory_amp",
             "connection_exhaustion", "consensus_abuse", "gossip_abuse",
             "auth_bypass", "rate_limiter_bypass", "service_misconfig",
-            "reconnaissance", "benign",
+            "reconnaissance", "subscription_cpu_amp", "state_import_abuse",
+            "benign",
         }
 
     def test_every_family_has_a_definition(self) -> None:

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-07-03
+
+### Added
+
+- **Two attack families promoted into the public taxonomy** (`python/bundle_spec/taxonomy.py`, `rust/bundle_spec/src/taxonomy.rs`, `schema/bundle_v1.schema.json`, `docs/adoption-guide.md`): `subscription_cpu_amp` (a subscription/streaming filter whose per-notification server CPU is disproportionate to the trivial cost of subscribing) and `state_import_abuse` (a malformed/oversized state artefact that crashes a node's snapshot/bootstrap import path before validation). The taxonomy is now **12 attack families + `benign`** (was 10 + benign). **Additive enum extension** — existing bundles stay valid; a new bundle carrying either value validates against ≥0.2.0. Schema regenerated; all tests pass (Python + Rust).
+
 ## [0.1.3] - 2026-07-01
 
 ### Added

@@ -5,7 +5,7 @@ infrastructure becomes comparable: one on-disk shape, one labelling scheme, one 
 adoptable on your own data without coordination. This guide shows how to classify a node or client
 integrity finding into the vocabulary. It is deliberately short.
 
-## The eleven families
+## The thirteen families
 
 | family | what it is | how to tell it apart |
 |---|---|---|
@@ -19,6 +19,8 @@ integrity finding into the vocabulary. It is deliberately short.
 | `rate_limiter_bypass` | a defect in the rate-limiter's own logic | fail-open, burst-doubling, or key-collision, not a response-size issue |
 | `service_misconfig` | exploitation of a misconfigured co-located daemon | Redis, Grafana, Prometheus, SSH, and similar |
 | `reconnaissance` | discovery and target-mapping traffic itself | it is the prior stage, not the exploit |
+| `subscription_cpu_amp` | a wide/streaming subscription whose per-event server CPU is disproportionate to the cheap subscribe | the cost is per-event over a persistent subscription, not per single request |
+| `state_import_abuse` | a malformed/oversized state artefact crashes the snapshot/bootstrap import path | the surface is a fetched bootstrap artefact, not a live request |
 | `benign` | no attack shape | it trains the "not malicious" boundary |
 
 ## How to classify a finding

@@ -38,7 +38,7 @@
       "type": "object"
     },
     "FamilyId": {
-      "description": "Chain-agnostic vulnerability-class label for a bundle.\n\nEnumeration: 10 attack families + 1 benign. ``reconnaissance`` is\na deferred-population slot in v0.1.0 \u2014 the scaffolded family for\npre-discovery and target-mapping activity (covered in upstream\nresearch but currently unpopulated in the public reference\ncorpus).",
+      "description": "Chain-agnostic vulnerability-class label for a bundle.\n\nEnumeration: 12 attack families + 1 benign. ``reconnaissance`` is\na deferred-population slot in v0.1.0 \u2014 the scaffolded family for\npre-discovery and target-mapping activity (covered in upstream\nresearch but currently unpopulated in the public reference\ncorpus).",
       "enum": [
         "response_amp",
         "compute_amp",
@@ -50,6 +50,8 @@
         "rate_limiter_bypass",
         "service_misconfig",
         "reconnaissance",
+        "subscription_cpu_amp",
+        "state_import_abuse",
         "benign"
       ],
       "title": "FamilyId",

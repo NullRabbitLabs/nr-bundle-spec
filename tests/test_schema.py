@@ -157,7 +157,8 @@ def test_bundle_schema_includes_family_id_enum():
         "response_amp", "compute_amp", "memory_amp",
         "connection_exhaustion", "consensus_abuse", "gossip_abuse",
         "auth_bypass", "rate_limiter_bypass", "service_misconfig",
-        "reconnaissance", "benign",
+        "reconnaissance", "subscription_cpu_amp", "state_import_abuse",
+        "benign",
     }
     assert enum_values == expected
 
