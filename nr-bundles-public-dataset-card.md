@@ -19,7 +19,7 @@ size_categories:
 
 # nr-bundles-public
 
-A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Forty-eight bundles across four chains (Sui, Solana, IOTA, Cosmos), twelve populated families (of thirteen in the taxonomy), and eighteen attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
+A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Eighty-one bundles across four chains (Sui, Solana, IOTA, Cosmos), twelve populated families (of thirteen in the taxonomy), and twenty attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
 
 ## What this dataset is
 
@@ -27,7 +27,7 @@ Most security datasets on the Hub are either application-layer (smart contract v
 
 Each entry is a **bundle**: a multi-modal observation of validator infrastructure under a single workload. Bundles capture network packets, host telemetry, application metrics, and observed responses simultaneously, under a chain-agnostic schema. The format is open and specified at [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec) (MIT-licensed). Anyone can produce v1 bundles for any chain.
 
-This release publishes forty-eight bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
+This release publishes eighty-one bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
 
 ## Bundle structure
 
@@ -75,7 +75,7 @@ One family in the full taxonomy (`gossip_abuse`) is not populated in this releas
 
 ## What's included
 
-Forty-eight bundles total. Forty-one attack bundles, seven benign. Twenty-three Solana, eleven Sui, two IOTA, twelve Cosmos. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), thirty-one at `fidelity_class: lab` (no TLS termination; raw pcap dropped).
+Eighty-one bundles total. Seventy-four attack bundles, seven benign. Twenty-three Solana, eleven Sui, eighteen IOTA, twenty-nine Cosmos. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), sixty-four at `fidelity_class: lab` (no TLS termination; raw pcap dropped).
 
 The `Pcap modality` column below specifies which network-layer file is present on disk per bundle: `pre-term TLS` means `pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP headers visible); `none` means the raw `packets.pcap` was dropped and no pre-term variant exists (`BundleFiles.packets_pcap=False` in the manifest).
 
@@ -111,26 +111,30 @@ The two Solana benign primitives have different fidelity classes because they ob
 | `sui_BENIGN_reproducer_pipeline` | benign | 1 | lab-tls-fronted | pre-term TLS | reproducer baseline |
 | `sui_BENIGN_validator_under_load` | benign | 1 | lab | none | active workload |
 
-**IOTA (2 bundles)**
+**IOTA (18 bundles)**
 
 | Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
 |---|---|---|---|---|---|
 | `iota_grpc_h2_multiplex_oom` | memory_amp | 1 | lab | none | attack; unbounded HTTP/2 concurrent-stream OOM on the public gRPC surface |
 | `iota_s1_widefilter_subscribe_cpu` | subscription_cpu_amp | 1 | lab | none | attack; wide event-filter subscription → exponential per-event CPU |
+| `iota_grpc_stream_cap_dos` | connection_exhaustion | 16 | lab | none | attack; StreamCheckpoints subscription-semaphore (1024) hold-shape exhaustion, saturating posture with a 640–1024 stream-count sweep |
 
 The three 2026-07-02 additions (`sui_f10_multiget_response_amp`, `sui_subscription_permit_leak`, `iota_grpc_h2_multiplex_oom`) are NullRabbit original-research findings (`source_class: original`, `ground_truth_label: attack`), each also the subject of a published operator advisory (NR-2026-004, NR-2026-005, NR-2026-003 respectively). They add IOTA as a third chain and populate the `connection_exhaustion` and `memory_amp` families.
 
 The two 2026-07-03 additions (`sol_snapshot_oversized_datalen_indexgen_panic`, `iota_s1_widefilter_subscribe_cpu`) populate the two families promoted into the taxonomy in [nr-bundle-spec v0.2.0](https://github.com/NullRabbitLabs/nr-bundle-spec): `state_import_abuse` (a malformed snapshot artefact that crashes the bootstrap import path) and `subscription_cpu_amp` (a wide event-filter subscription driving exponential per-event CPU).
 
-**Cosmos (12 bundles)**
+**Cosmos (29 bundles)**
 
 | Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
 |---|---|---|---|---|---|
 | `cometbft_proposal_flood` | consensus_abuse | 4 | lab | none | 4 postures; ProposalMessage flood (DataChannel 0x21) |
 | `cometbft_vote_flood` | consensus_abuse | 4 | lab | none | 4 postures; VoteMessage flood (VoteChannel 0x22) |
 | `cometbft_blocksync_flood` | consensus_abuse | 4 | lab | none | 4 postures; oversized BlockResponse (BlockSync 0x40) |
+| `cometbft_mconn_handshake_burn` | compute_amp | 17 | lab | none | attack; SecretConnection STS handshake pre-auth X25519+Ed25519 crypto burn on :26656; 4 postures (saturating, distributed, low-volume, mimicry) |
 
 The three CometBFT consensus-channel floods are one finding family (operator advisory [NR-2026-007](https://github.com/NullRabbitLabs/nullrabbit-advisories)): valid-shape unsigned consensus messages queued before signature verification → single-node CPU. `source_class: original`; MEDIUM — a multi-validator quorum keeps producing blocks under the attack. They populate the `consensus_abuse` family.
+
+The 2026-07-04 additions (`cometbft_mconn_handshake_burn`, `iota_grpc_stream_cap_dos`) are NullRabbit original-research findings (`source_class: original`, `ground_truth_label: attack`). `cometbft_mconn_handshake_burn` is a pre-authentication SecretConnection STS-handshake crypto burn on the CometBFT P2P port (COSMOS_MCONN_PREAUTH); `iota_grpc_stream_cap_dos` is a hold-shape exhaustion of the IOTA gRPC `StreamCheckpoints` subscription semaphore (IOTA_GRPC_STREAM_CAP_DOS, HIGH). They deepen the `compute_amp` and `connection_exhaustion` families respectively.
 
 Posture variations capture distinct attack shapes against the same primitive (saturating throughput, low-volume, distributed-source, mimicry of organic traffic, historical-CVE patterns). Bundles within a primitive are intentionally non-identical so the dataset surfaces the variance the format is designed to represent.
 
@@ -138,7 +142,7 @@ Posture variations capture distinct attack shapes against the same primitive (sa
 
 NullRabbit operates a reproducer pipeline that captures bundles under controlled conditions: validator daemons run on isolated infrastructure, workloads (attack or benign) are scripted and replayable, capture is synchronous across all five modalities, and every bundle's provenance is hashed end-to-end.
 
-The full archived corpus (corpus_v1.0 through corpus_v1.10) contains thousands of bundles across additional primitives, families, and fidelity classes. This release is a curated thirty-one-bundle subset selected to demonstrate format coverage and provide training material for external researchers, with the rest of the corpus retained as the proprietary training surface for NullRabbit's production models.
+The full archived corpus (corpus_v1.0 through corpus_v1.10) contains thousands of bundles across additional primitives, families, and fidelity classes. This release is a curated eighty-one-bundle subset selected to demonstrate format coverage and provide training material for external researchers, with the rest of the corpus retained as the proprietary training surface for NullRabbit's production models.
 
 The corpus is versioned and immutable. Each version archives only bundles new to that version. Failed iterations stay on disk as evidence; only versions passing close-out are promoted to archive.
 
@@ -162,8 +166,8 @@ This dataset is intended for:
 ## Limitations
 
 - **Lab fidelity only.** All bundles in this release were captured in a controlled reproducer environment, not on mainnet or testnet. The capture pipeline has known fidelity envelopes; production-deployment generalisation is an open empirical question.
-- **Three chains.** Sui, Solana, and IOTA. Cross-chain claims in published work apply specifically to this corpus; broader generalisation (Cosmos, Ethereum, Aptos, others) is queued for subsequent corpus versions.
-- **Curated subset.** Thirty-four bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
+- **Four chains.** Sui, Solana, IOTA, and Cosmos. Cross-chain claims in published work apply specifically to this corpus; broader generalisation (Ethereum, Aptos, others) is queued for subsequent corpus versions.
+- **Curated subset.** Eighty-one bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
 - **Raw `packets.pcap` is dropped from every bundle in this release.** Two policies apply per fidelity class:
   - `lab-tls-fronted` bundles (17): post-termination cleartext `packets.pcap` is dropped via `tools/strip_pcap.py` (from `nr-bundle-spec`); the pre-termination TLS pcap (`pcap_pre_termination.pcap`) is retained. TLS frames are encrypted; only IP/TCP headers are visible at the pre-term wire vantage.
   - `lab` bundles (17): no pre-term variant exists; the raw `packets.pcap` is dropped and `BundleFiles.packets_pcap=False` is set in the manifest. The remaining Parquet modalities (host plus whichever of app, protocol, responses were captured for the workload) stay intact.
