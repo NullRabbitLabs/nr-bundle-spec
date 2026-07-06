@@ -17,19 +17,24 @@ tags:
   - cardano
   - xrp
   - bitcoin
+  - ethereum
+  - monero
+  - dogecoin
+  - litecoin
+  - libp2p
 pretty_name: nr-bundles-public
 size_categories:
   - n<1K
 ---
 
-<!-- nr-bundle-count: 104 -->
-<!-- nr-chains: aptos,bitcoin,cardano,cosmos,iota,solana,sui,xrp -->
+<!-- nr-bundle-count: 395 -->
+<!-- nr-chains: aptos,bitcoin,cardano,cosmos,dogecoin,ethereum,iota,libp2p,litecoin,monero,solana,solana-agave,sui,xrp -->
 <!-- Keep the count marker equal to the live dataset's bundle-dir count. scripts/publish_dataset.py
      (--card at publish, --check-card-only for daily monitoring) asserts it and fails loud on drift. -->
 
 # nr-bundles-public
 
-A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. One hundred and four bundles across eight chains (Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP, Bitcoin), all thirteen families in the taxonomy (twelve attack classes plus `benign`), and twenty-seven attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
+A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. Three hundred and ninety-five bundles across thirteen chains and network stacks (Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP, Bitcoin, Ethereum, Monero, Dogecoin, Litecoin, and libp2p), all thirteen families in the taxonomy (twelve attack classes plus `benign`), and seventy-one attack primitive_ids — including faithful wire-level reproductions of **forty-two publicly disclosed CVEs and security advisories** in blockchain node software. Released as the public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
 
 ## What this dataset is
 
@@ -37,7 +42,7 @@ Most security datasets on the Hub are either application-layer (smart contract v
 
 Each entry is a **bundle**: a multi-modal observation of validator infrastructure under a single workload. Bundles capture network packets, host telemetry, application metrics, and observed responses simultaneously, under a chain-agnostic schema. The format is open and specified at [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec) (MIT-licensed). Anyone can produce v1 bundles for any chain.
 
-This release publishes one hundred and four bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
+This release publishes three hundred and ninety-five bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. Two provenance classes are represented: `original` (NullRabbit's own disclosed findings, each with a published operator advisory) and `public-cve-replication` (faithful reproductions of already-public CVEs / security advisories, each linking its original disclosure via `provenance.public_source`). The `public-cve-replication` bundles are the browsable, per-bundle form of data that already underpins the public [`nr-network-known-class-detector`](https://huggingface.co/NullRabbit/nr-network-known-class-detector) model — this release publishes them as inspectable bundle data, not as a first appearance on the Hub. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
 
 ## Bundle structure
 
@@ -62,7 +67,7 @@ Full schema: [`nr-bundle-spec` v0.2.0](https://github.com/NullRabbitLabs/nr-bund
 
 ## Family taxonomy
 
-Bundles are classified by **family**, defined by attack mechanism rather than by chain. Because the format and the mechanism are shared across chains, cross-chain generalisation becomes **testable**: you can hold out an entire chain and measure whether a model trained on the others recovers a family. On this corpus it does **not** transfer yet: held-out-chain family macro-F1 is **0.17 (Sui held out) / 0.35 (Solana held out)**, against a 7-class random floor of ~0.14. Cross-chain transfer is the open question the shared format lets you pose and measure, not a result this dataset demonstrates; closing the gap needs more chains per family, not more features.
+Bundles are classified by **family**, defined by attack mechanism rather than by chain. Because the format and the mechanism are shared across chains, cross-chain generalisation becomes **testable**: you can hold out an entire chain and measure whether a model trained on the others recovers a family. On this corpus it does **not** transfer yet: held-out-chain family macro-F1 is **0.17 (Sui held out) / 0.35 (Solana held out)** — measured on the original eight-chain cut, before the public-CVE-replication additions — against a 7-class random floor of ~0.14. Cross-chain transfer is the open question the shared format lets you pose and measure, not a result this dataset demonstrates; closing the gap needs more chains per family, not more features.
 
 These are **validator / node-software** vulnerability classes only. On-chain contract / DeFi-economic findings are a separate, out-of-scope namespace and are never used here. The full taxonomy defines thirteen families (twelve attack classes plus `benign`). All thirteen are populated in this release:
 
@@ -84,9 +89,13 @@ These are **validator / node-software** vulnerability classes only. On-chain con
 
 ## What's included
 
-One hundred and four bundles total. Ninety-seven attack bundles, seven benign. Twenty-three Solana, fourteen Sui, twenty-two IOTA, twenty-nine Cosmos, four Aptos, six Cardano, three XRP, three Bitcoin. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), seventy-five at `lab` and twelve at `proxy` (raw pcap dropped, no pre-term variant).
+Three hundred and ninety-five bundles total: three hundred and eighty-eight attack, seven benign. By provenance class: one hundred and six `original` (NullRabbit's own disclosed findings), thirty-one legacy-sample (the 2026-05-13 Solana/Sui curation), and two hundred and fifty-eight `public-cve-replication`. The raw `packets.pcap` is dropped from every bundle (`BundleFiles.packets_pcap=False`); no pre-termination pcap variant is retained.
 
-The `Pcap modality` column below specifies which network-layer file is present on disk per bundle: `pre-term TLS` means `pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP headers visible); `none` means the raw `packets.pcap` was dropped and no pre-term variant exists (`BundleFiles.packets_pcap=False` in the manifest).
+The `Pcap modality` column in the tables below specifies which network-layer file is present on disk per bundle: `pre-term TLS` means `pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP headers visible); `none` means the raw `packets.pcap` was dropped and no pre-term variant exists (`BundleFiles.packets_pcap=False` in the manifest).
+
+### Disclosed findings and legacy sample (137 bundles)
+
+These are NullRabbit's own `original` findings — each with a published operator advisory — plus the legacy 2026-05-13 Solana/Sui sample.
 
 **Solana (23 bundles)**
 
@@ -134,7 +143,7 @@ The three 2026-07-02 additions (`sui_f10_multiget_response_amp`, `sui_subscripti
 
 The two 2026-07-03 additions (`sol_snapshot_oversized_datalen_indexgen_panic`, `iota_s1_widefilter_subscribe_cpu`) populate the two families promoted into the taxonomy in [nr-bundle-spec v0.2.0](https://github.com/NullRabbitLabs/nr-bundle-spec): `state_import_abuse` (a malformed snapshot artefact that crashes the bootstrap import path) and `subscription_cpu_amp` (a wide event-filter subscription driving exponential per-event CPU).
 
-**Cosmos (29 bundles)**
+**Cosmos (45 bundles)**
 
 | Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
 |---|---|---|---|---|---|
@@ -142,10 +151,19 @@ The two 2026-07-03 additions (`sol_snapshot_oversized_datalen_indexgen_panic`, `
 | `cometbft_vote_flood` | consensus_abuse | 4 | lab | none | 4 postures; VoteMessage flood (VoteChannel 0x22) |
 | `cometbft_blocksync_flood` | memory_amp | 4 | lab | none | 4 postures; oversized BlockResponse accumulation (BlockSync 0x40) |
 | `cometbft_mconn_handshake_burn` | compute_amp | 17 | lab | none | attack; SecretConnection STS handshake pre-auth X25519+Ed25519 crypto burn on :26656; 4 postures (saturating, distributed, low-volume, mimicry) |
+| `cosmos_grpc_stream_flood` | connection_exhaustion | 16 | lab | none | attack; cosmos-sdk gRPC server built without `MaxConcurrentStreams` → unbounded held-stream per-stream pin on :9090; saturating posture with a 512–2048 stream-count sweep (COSMOS_SDK_GRPC_STREAM_FLOOD / C11; NR-2026-018) |
 
 The three CometBFT consensus-channel floods are one finding family (operator advisory [NR-2026-007](https://github.com/NullRabbitLabs/nullrabbit-advisories)): valid-shape unsigned consensus messages queued before signature verification. `source_class: original`; MEDIUM — a multi-validator quorum keeps producing blocks under the attack. Mechanistically they split across two families as the manifests record: `cometbft_proposal_flood` and `cometbft_vote_flood` drive single-node CPU (`consensus_abuse`), while `cometbft_blocksync_flood` accumulates process memory via oversized BlockResponses (`memory_amp`).
 
 The 2026-07-04 additions (`cometbft_mconn_handshake_burn`, `iota_grpc_stream_cap_dos`) are NullRabbit original-research findings (`source_class: original`, `ground_truth_label: attack`). `cometbft_mconn_handshake_burn` is a pre-authentication SecretConnection STS-handshake crypto burn on the CometBFT P2P port (COSMOS_MCONN_PREAUTH); `iota_grpc_stream_cap_dos` is a hold-shape exhaustion of the IOTA gRPC `StreamCheckpoints` subscription semaphore (IOTA_GRPC_STREAM_CAP_DOS, HIGH). They deepen the `compute_amp` and `connection_exhaustion` families respectively.
+
+**Ethereum (17 bundles)**
+
+| Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
+|---|---|---|---|---|---|
+| `reth_pooledtx_decode_memory_amp` | memory_amp | 17 | lab | none | attack; reth eth `Transactions`/`PooledTransactions` decoded into an unbounded `Vec` pre-#23718 → ~40× decode-memory amplification (436 MB per clean ≤10 MB message); saturating + distributed postures (RETH_TX_MEMORY_BUDGET; NR-2026-019) |
+
+`reth_pooledtx_decode_memory_amp` is a NullRabbit original-research finding (`source_class: original`, `ground_truth_label: attack`): pre-#23718 reth decodes the eth `Transactions`/`PooledTransactions` RLP list into an unbounded `Vec` before per-transaction validation, so a well-formed message that decodes cleanly (no misbehavior bump) allocates ~40× its wire size during decode — measured 436 MB for a ≤10 MB message, exceeding the 20 MB cap the fix introduces. Fixed in reth #23718 (`paradigmxyz/reth`). Captured against a protocol-compatible node (the eth/68 wire format is identical across clients).
 
 **Aptos (4 bundles)**
 
@@ -176,11 +194,101 @@ The 2026-07-06 additions (`iota_f10_multiget_amp`, `sui_h02_state_sync_flood`, `
 
 Posture variations capture distinct attack shapes against the same primitive (saturating throughput, low-volume, distributed-source, mimicry of organic traffic, historical-CVE patterns). Bundles within a primitive are intentionally non-identical so the dataset surfaces the variance the format is designed to represent.
 
+<!-- AUTO:cve-cut:BEGIN — regenerated nightly by nightly_train.publish_dataset_cut; do not hand-edit -->
+### Public-CVE replications (258 bundles)
+
+These 258 bundles are faithful wire-level reproductions of **42 publicly disclosed CVEs / security advisories** in blockchain node software, captured against the vulnerable node so the attack signature is real. Each bundle's `provenance.source_class` is `public-cve-replication` and `provenance.public_source` links the original disclosure.
+
+**Bitcoin Core (86 bundles, 21 primitives)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `btc_addr_overflow_flood` | `gossip_abuse` | 4 | https://bitcoincore.org/en/2025/04/28/disclose-cve-2024-52919/ |
+| `btc_alert_flood` | `memory_amp` | 4 | https://nvd.nist.gov/vuln/detail/CVE-2016-10724 |
+| `btc_blocktxn_double_fillblock` | `consensus_abuse` | 6 | https://bitcoincore.org/en/2024/10/08/disclose-blocktxn-crash/ |
+| `btc_bloom_divzero` | `compute_amp` | 4 | https://nvd.nist.gov/vuln/detail/CVE-2013-5700 |
+| `btc_cmpctblock_overflow` | `memory_amp` | 4 | https://bitcoincore.org/en/2025/10/24/disclose-cve-2025-46597/ |
+| `btc_cmpctblock_stall` | `connection_exhaustion` | 4 | https://bitcoincore.org/en/2024/11/05/cb-stall-hindering-propagation/ |
+| `btc_getdata_flood` | `connection_exhaustion` | 4 | https://bitcoincore.org/en/2024/07/03/disclose-getdata-cpu/ |
+| `btc_headers_genesis_spam` | `memory_amp` | 4 | https://bitcoincore.org/en/2024/07/03/disclose-header-spam/ |
+| `btc_headers_oom` | `memory_amp` | 4 | https://bitcoincore.org/en/2024/09/18/disclose-headers-oom/ |
+| `btc_inv_buffer_blowup` | `memory_amp` | 4 | https://bitcoincore.org/en/2024/07/03/disclose-inv-buffer-blowup/ |
+| `btc_inv_eviction_jam` | `gossip_abuse` | 4 | https://bitcoincore.org/en/2024/07/03/disclose_already_asked_for/ |
+| `btc_invalid_block_logfill` | `memory_amp` | 4 | https://bitcoincore.org/en/2025/10/24/disclose-cve-2025-54605/ |
+| `btc_invdos_flood` | `memory_amp` | 4 | https://invdos.net/ |
+| `btc_mutated_block` | `consensus_abuse` | 4 | https://bitcoincore.org/en/2024/10/08/disclose-mutated-blocks-hindering-propagation/ |
+| `btc_orphan_cpu` | `compute_amp` | 4 | https://bitcoincore.org/en/2024/07/03/disclose-orphan-dos/ |
+| `btc_oversized_recv_buffer` | `memory_amp` | 4 | https://bitcoincore.org/en/2024/07/03/disclose_receive_buffer_oom/ |
+| `btc_tx_maprelay` | `memory_amp` | 4 | https://nvd.nist.gov/vuln/detail/CVE-2013-4627 |
+| `btc_tx_quad_sighash` | `compute_amp` | 4 | https://bitcoincore.org/en/2025/10/24/disclose-cve-2025-46598/ |
+| `btc_version_selfnonce` | `memory_amp` | 4 | https://bitcoincore.org/en/2025/10/24/disclose-cve-2025-54604/ |
+| `btc_version_timestamp_overflow` | `consensus_abuse` | 4 | https://bitcoincore.org/en/2024/07/03/disclose-timestamp-overflow/ |
+| `p2p_getheaders_drain` | `response_amp` | 4 | https://nvd.nist.gov/vuln/detail/CVE-2023-33297 |
+
+**Cosmos / CometBFT (74 bundles, 6 primitives)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `cometbft_bitarray_mismatch` | `consensus_abuse` | 16 | https://github.com/cometbft/cometbft/security/advisories/GHSA-hrhf-2vcr-ghch |
+| `cometbft_blockpart_mismatch` | `consensus_abuse` | 16 | https://github.com/advisories/GHSA-r3r4-g7hq-pq4f |
+| `cometbft_voteext_panic` | `consensus_abuse` | 16 | https://github.com/cometbft/cometbft/security/advisories/GHSA-p7mv-53f2-4cwj |
+| `cosmos_gogoproto_skippy` | `compute_amp` | 16 | https://osv.dev/vulnerability/CVE-2021-3121 |
+| `cosmos_group_divzero_halt` | `consensus_abuse` | 8 | https://github.com/cosmos/cosmos-sdk/security/advisories/GHSA-x5vx-95h7-rv4p |
+| `cosmos_protobuf_nest_bomb` | `compute_amp` | 2 | https://github.com/cosmos/cosmos-sdk/security/advisories/GHSA-8wcc-m6j2-qxvm |
+
+**Ethereum (go-ethereum) (48 bundles, 6 primitives)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `geth_devp2p_ping_flood` | `connection_exhaustion` | 4 | https://github.com/ethereum/go-ethereum/security/advisories/GHSA-ppjg-v974-84cm |
+| `geth_eth_receipt_flood` | `memory_amp` | 12 | https://reports.immunefi.com/ethereum-protocol-or-attackathon/37466-bc-medium-evil-client-oom-crash-fast-p2p-crash |
+| `geth_getblockheaders_count_zero` | `memory_amp` | 12 | https://github.com/ethereum/go-ethereum/security/advisories/GHSA-4xc9-8hmq-j652 |
+| `geth_rlpx_auth_flood` | `connection_exhaustion` | 4 | https://notes.ethereum.org/gDWKW5RtSym02t2aGYkmSQ |
+| `geth_snap_trienode_dos` | `compute_amp` | 12 | https://github.com/ethereum/go-ethereum/security/advisories/GHSA-59hh-656j-3p7v |
+| `geth_tcp_handshake_flood` | `connection_exhaustion` | 4 | https://reports.immunefi.com/ethereum-protocol-or-attackathon/37120-bc-insight-remote-handshake-based-tcp-30303-flooding-leads-to-an-out-of-memory-crash |
+
+**Monero (18 bundles, 2 primitives)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `monero_levin_array_memcorrupt` | `compute_amp` | 2 | https://www.talosintelligence.com/vulnerability_reports/TALOS-2018-0637 |
+| `monero_rpc_conn_exhaustion` | `connection_exhaustion` | 16 | https://nvd.nist.gov/vuln/detail/CVE-2025-26819 |
+
+**libp2p (16 bundles, 4 primitives)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `gossipsub_prune_backoff_overflow` | `gossip_abuse` | 4 | https://github.com/libp2p/rust-libp2p/security/advisories/GHSA-xqmp-fxgv-xvq5 |
+| `gossipsub_subscribe_flood` | `gossip_abuse` | 4 | https://github.com/advisories/GHSA-4f8r-922h-2vgv |
+| `libp2p_signed_peer_record_flood` | `gossip_abuse` | 4 | https://github.com/advisories/GHSA-gcq9-qqwx-rgj3 |
+| `libp2p_stream_exhaustion` | `connection_exhaustion` | 4 | https://github.com/advisories/GHSA-j7qp-mfxf-8xjw |
+
+**Sui (12 bundles, 3 primitives)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `sui_disassemble_panic` | `compute_amp` | 4 | https://medium.com/certik-skyfall/blockchain-rpc-vulnerabilities-why-memory-safe-blockchain-rpc-nodes-are-not-panic-free-9fbb990115e0 |
+| `sui_move_recursion` | `compute_amp` | 4 | https://nvd.nist.gov/vuln/detail/CVE-2023-36184 |
+| `sui_verifier_hamsterwheel` | `compute_amp` | 4 | https://medium.com/certik-skyfall/the-hamsterwheel-an-in-depth-exploration-of-a-novel-attack-vector-on-the-sui-blockchain-522f80623bc7 |
+
+**Dogecoin (2 bundles, 1 primitive)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `p2p_getheaders_drain` | `response_amp` | 2 | https://nvd.nist.gov/vuln/detail/CVE-2023-33297 |
+
+**Litecoin (2 bundles, 1 primitive)**
+
+| Primitive | Family | Bundles | Public source |
+|---|---|---|---|
+| `p2p_getheaders_drain` | `response_amp` | 2 | https://nvd.nist.gov/vuln/detail/CVE-2023-33297 |
+<!-- AUTO:cve-cut:END -->
+
 ## How the corpus is built
 
 NullRabbit operates a reproducer pipeline that captures bundles under controlled conditions: validator daemons run on isolated infrastructure, workloads (attack or benign) are scripted and replayable, capture is synchronous across all five modalities, and every bundle's provenance is hashed end-to-end.
 
-The full archived corpus (corpus_v1.0 through corpus_v1.10) contains thousands of bundles across additional primitives, families, and fidelity classes. This release is a curated one-hundred-and-one-bundle subset selected to demonstrate format coverage and provide training material for external researchers, with the rest of the corpus retained as the proprietary training surface for NullRabbit's production models.
+The full archived corpus (corpus_v1.0 through corpus_v1.10) contains thousands of bundles across additional primitives, families, and fidelity classes. This release is a curated three-hundred-and-ninety-five-bundle subset selected to demonstrate format coverage and provide training material for external researchers, with the rest of the corpus retained as the proprietary training surface for NullRabbit's production models.
 
 The corpus is versioned and immutable. Each version archives only bundles new to that version. Failed iterations stay on disk as evidence; only versions passing close-out are promoted to archive.
 
@@ -204,14 +312,12 @@ This dataset is intended for:
 ## Limitations
 
 - **Lab fidelity only.** All bundles in this release were captured in a controlled reproducer environment, not on mainnet or testnet. The capture pipeline has known fidelity envelopes; production-deployment generalisation is an open empirical question.
-- **Eight chains.** Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP (XRPL), and Bitcoin. Cross-chain claims in published work apply specifically to this corpus; broader generalisation (Ethereum, others) is queued for subsequent corpus versions.
-- **Curated subset.** One hundred and four bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
-- **Raw `packets.pcap` is dropped from every bundle in this release.** Two policies apply per fidelity class:
-  - `lab-tls-fronted` bundles (17): post-termination cleartext `packets.pcap` is dropped via `tools/strip_pcap.py` (from `nr-bundle-spec`); the pre-termination TLS pcap (`pcap_pre_termination.pcap`) is retained. TLS frames are encrypted; only IP/TCP headers are visible at the pre-term wire vantage.
-  - `lab` and `proxy` bundles (81): no pre-term variant exists; the raw `packets.pcap` is dropped and `BundleFiles.packets_pcap=False` is set in the manifest. The remaining Parquet modalities (host plus whichever of app, protocol, responses were captured for the workload) stay intact.
+- **Thirteen chains and stacks.** Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP (XRPL), Bitcoin, Ethereum, Monero, Dogecoin, Litecoin, and libp2p. Cross-chain claims in published work apply specifically to this corpus; the measured held-out-chain transfer figures above predate the public-CVE-replication additions and have not been re-measured on the full 13-chain corpus.
+- **Curated subset.** Three hundred and ninety-five bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
+- **Raw `packets.pcap` is dropped from every bundle in this release.** `BundleFiles.packets_pcap=False` is set in every manifest and no pre-termination pcap variant is retained (dropped via `tools/strip_pcap.py` from `nr-bundle-spec`). The remaining Parquet modalities (host plus whichever of app, protocol, responses were captured for the workload) stay intact for all three hundred and ninety-five bundles.
   Future dataset versions may include a header-only stripped variant of `packets.pcap` for `lab` bundles once payload-stripping tooling has been verified.
 - **Modality presence varies by workload.** Passive-workload benigns (`sui_BENIGN_passive_fullnode`, `solana_BENIGN_validator_passive`) do not serve RPC traffic during capture; their `responses.parquet` is absent or zero-rows and `BundleFiles.responses_parquet=False` in the manifest. Consumers must check the manifest's `files` block before reading each modality. `vectors.parquet` is reserved-but-unpopulated in this release; consumers derive feature vectors at inference time.
-- **Disclosure status varies by primitive.** SOL_F10/F14/P07 are publicly disclosed per NR-2026-001. The original-research primitives added since each carry a published operator advisory (NR-2026-003 through NR-2026-014); others represent methodology-class findings or are referenced in coordinated-disclosure channels with respective ecosystems.
+- **Disclosure status varies by primitive.** SOL_F10/F14/P07 are publicly disclosed per NR-2026-001. The other original-research primitives each carry a published operator advisory (NR-2026-003 through NR-2026-017). The `public-cve-replication` primitives reproduce already-public CVEs / security advisories; each links its original disclosure via `provenance.public_source` (also tabulated above).
 
 ## How to use this dataset
 
