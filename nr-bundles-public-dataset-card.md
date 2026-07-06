@@ -84,7 +84,7 @@ These are **validator / node-software** vulnerability classes only. On-chain con
 
 ## What's included
 
-Ninety-eight bundles total. Ninety-one attack bundles, seven benign. Twenty-three Solana, fourteen Sui, twenty-two IOTA, twenty-nine Cosmos, four Aptos, three Cardano, three XRP. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), seventy-five at `lab` and nine at `proxy` (raw pcap dropped, no pre-term variant).
+One hundred and one bundles total. Ninety-four attack bundles, seven benign. Twenty-three Solana, fourteen Sui, twenty-two IOTA, twenty-nine Cosmos, four Aptos, three Cardano, three XRP, three Bitcoin. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), seventy-five at `lab` and nine at `proxy` (raw pcap dropped, no pre-term variant).
 
 The `Pcap modality` column below specifies which network-layer file is present on disk per bundle: `pre-term TLS` means `pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP headers visible); `none` means the raw `packets.pcap` was dropped and no pre-term variant exists (`BundleFiles.packets_pcap=False` in the manifest).
 
@@ -203,8 +203,8 @@ This dataset is intended for:
 ## Limitations
 
 - **Lab fidelity only.** All bundles in this release were captured in a controlled reproducer environment, not on mainnet or testnet. The capture pipeline has known fidelity envelopes; production-deployment generalisation is an open empirical question.
-- **Seven chains.** Sui, Solana, IOTA, Cosmos, Aptos, Cardano, and XRP (XRPL). Cross-chain claims in published work apply specifically to this corpus; broader generalisation (Ethereum, others) is queued for subsequent corpus versions.
-- **Curated subset.** Ninety-eight bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
+- **Eight chains.** Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP (XRPL), and Bitcoin. Cross-chain claims in published work apply specifically to this corpus; broader generalisation (Ethereum, others) is queued for subsequent corpus versions.
+- **Curated subset.** One hundred and one bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
 - **Raw `packets.pcap` is dropped from every bundle in this release.** Two policies apply per fidelity class:
   - `lab-tls-fronted` bundles (17): post-termination cleartext `packets.pcap` is dropped via `tools/strip_pcap.py` (from `nr-bundle-spec`); the pre-termination TLS pcap (`pcap_pre_termination.pcap`) is retained. TLS frames are encrypted; only IP/TCP headers are visible at the pre-term wire vantage.
   - `lab` and `proxy` bundles (81): no pre-term variant exists; the raw `packets.pcap` is dropped and `BundleFiles.packets_pcap=False` is set in the manifest. The remaining Parquet modalities (host plus whichever of app, protocol, responses were captured for the workload) stay intact.
