@@ -22,14 +22,14 @@ size_categories:
   - n<1K
 ---
 
-<!-- nr-bundle-count: 101 -->
+<!-- nr-bundle-count: 104 -->
 <!-- nr-chains: aptos,bitcoin,cardano,cosmos,iota,solana,sui,xrp -->
 <!-- Keep the count marker equal to the live dataset's bundle-dir count. scripts/publish_dataset.py
      (--card at publish, --check-card-only for daily monitoring) asserts it and fails loud on drift. -->
 
 # nr-bundles-public
 
-A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. One hundred and one bundles across eight chains (Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP, Bitcoin), all thirteen families in the taxonomy (twelve attack classes plus `benign`), and twenty-six attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
+A curated, multi-modal dataset of blockchain validator infrastructure under attack and benign workloads. One hundred and four bundles across eight chains (Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP, Bitcoin), all thirteen families in the taxonomy (twelve attack classes plus `benign`), and twenty-seven attack primitive_ids. Released as the first public sample of NullRabbit's bundle corpus, which underpins [NullRabbit Labs'](https://huggingface.co/NullRabbit) ML research on autonomous defence for decentralised networks.
 
 ## What this dataset is
 
@@ -37,7 +37,7 @@ Most security datasets on the Hub are either application-layer (smart contract v
 
 Each entry is a **bundle**: a multi-modal observation of validator infrastructure under a single workload. Bundles capture network packets, host telemetry, application metrics, and observed responses simultaneously, under a chain-agnostic schema. The format is open and specified at [`nr-bundle-spec`](https://github.com/NullRabbitLabs/nr-bundle-spec) (MIT-licensed). Anyone can produce v1 bundles for any chain.
 
-This release publishes one hundred and one bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
+This release publishes one hundred and four bundles drawn from the NullRabbit corpus, with archive-provenance recorded per-bundle. The bundles selected demonstrate format coverage across the populated vulnerability families and provide attack/benign training material for cross-chain anomaly detection research.
 
 ## Bundle structure
 
@@ -84,7 +84,7 @@ These are **validator / node-software** vulnerability classes only. On-chain con
 
 ## What's included
 
-One hundred and one bundles total. Ninety-four attack bundles, seven benign. Twenty-three Solana, fourteen Sui, twenty-two IOTA, twenty-nine Cosmos, four Aptos, three Cardano, three XRP, three Bitcoin. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), seventy-five at `lab` and nine at `proxy` (raw pcap dropped, no pre-term variant).
+One hundred and four bundles total. Ninety-seven attack bundles, seven benign. Twenty-three Solana, fourteen Sui, twenty-two IOTA, twenty-nine Cosmos, four Aptos, six Cardano, three XRP, three Bitcoin. Seventeen bundles at `fidelity_class: lab-tls-fronted` (retain pre-term TLS pcap), seventy-five at `lab` and twelve at `proxy` (raw pcap dropped, no pre-term variant).
 
 The `Pcap modality` column below specifies which network-layer file is present on disk per bundle: `pre-term TLS` means `pcap_pre_termination.pcap` is retained (encrypted TLS frames; IP/TCP headers visible); `none` means the raw `packets.pcap` was dropped and no pre-term variant exists (`BundleFiles.packets_pcap=False` in the manifest).
 
@@ -153,11 +153,12 @@ The 2026-07-04 additions (`cometbft_mconn_handshake_burn`, `iota_grpc_stream_cap
 |---|---|---|---|---|---|
 | `aptos_f10_modules_amp` | response_amp | 4 | lab | none | attack; `/v1/accounts/{addr}/modules?limit=200` REST egress amplification (~11,186×) (APT_F10; NR-2026-012); 4 postures |
 
-**Cardano (3 bundles)**
+**Cardano (6 bundles)**
 
 | Primitive | Family | Bundles | Fidelity | Pcap modality | Coverage |
 |---|---|---|---|---|---|
 | `cardano_submit_api_body_memory_pin` | memory_amp | 3 | proxy | none | attack; `cardano-submit-api` has no Warp request-body cap → ~500 MB RSS pinned per request (CARDANO_SUBMIT_API_BODY; NR-2026-013); 3 postures |
+| `cardano_peershare_sort_cpu` | compute_amp | 3 | proxy | none | attack; PeerSharing `MsgShareRequest` triggers an O(N log N) sort over ~3000 peers with no rate limit → CPU pin (~170µs/req) (H_CARDANO_4_PEERSHARING; NR-2026-017); 3 postures |
 
 **XRP (3 bundles)**
 
@@ -171,7 +172,7 @@ The 2026-07-04 additions (`cometbft_mconn_handshake_burn`, `iota_grpc_stream_cap
 |---|---|---|---|---|---|
 | `btc_bip324_prehandshake_ecdh_cpu` | compute_amp | 3 | proxy | none | attack; Bitcoin Core BIP-324 v2 transport runs ellswift-ECDH+HKDF on the 64-byte inbound key before any auth/rate-limit → pre-auth CPU pin (55×/256× honest-peer latency) (BTC_V0_BIP324_PREHANDSHAKE_CPU; NR-2026-016); 3 postures |
 
-The 2026-07-06 additions (`iota_f10_multiget_amp`, `sui_h02_state_sync_flood`, `aptos_f10_modules_amp`, `cardano_submit_api_body_memory_pin`, `rippled_batch_response_amp`, `btc_bip324_prehandshake_ecdh_cpu`) are NullRabbit original-research findings (`source_class: original`, `ground_truth_label: attack`), each the subject of a published operator advisory (NR-2026-010, NR-2026-011, NR-2026-012, NR-2026-013, NR-2026-014, NR-2026-016 respectively). They add Aptos, Cardano, XRP (XRPL), and Bitcoin as the fifth through eighth chains, and `sui_h02_state_sync_flood` populates `gossip_abuse` — the last previously-empty family — so all thirteen taxonomy families now carry bundles.
+The 2026-07-06 additions (`iota_f10_multiget_amp`, `sui_h02_state_sync_flood`, `aptos_f10_modules_amp`, `cardano_submit_api_body_memory_pin`, `rippled_batch_response_amp`, `btc_bip324_prehandshake_ecdh_cpu`, `cardano_peershare_sort_cpu`) are NullRabbit original-research findings (`source_class: original`, `ground_truth_label: attack`), each the subject of a published operator advisory (NR-2026-010, NR-2026-011, NR-2026-012, NR-2026-013, NR-2026-014, NR-2026-016, NR-2026-017 respectively). They add Aptos, Cardano, XRP (XRPL), and Bitcoin as the fifth through eighth chains, and `sui_h02_state_sync_flood` populates `gossip_abuse` — the last previously-empty family — so all thirteen taxonomy families now carry bundles.
 
 Posture variations capture distinct attack shapes against the same primitive (saturating throughput, low-volume, distributed-source, mimicry of organic traffic, historical-CVE patterns). Bundles within a primitive are intentionally non-identical so the dataset surfaces the variance the format is designed to represent.
 
@@ -204,7 +205,7 @@ This dataset is intended for:
 
 - **Lab fidelity only.** All bundles in this release were captured in a controlled reproducer environment, not on mainnet or testnet. The capture pipeline has known fidelity envelopes; production-deployment generalisation is an open empirical question.
 - **Eight chains.** Sui, Solana, IOTA, Cosmos, Aptos, Cardano, XRP (XRPL), and Bitcoin. Cross-chain claims in published work apply specifically to this corpus; broader generalisation (Ethereum, others) is queued for subsequent corpus versions.
-- **Curated subset.** One hundred and one bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
+- **Curated subset.** One hundred and four bundles do not represent the full distribution of attack shapes in NullRabbit's archived corpus. The subset is selected for coverage, not for statistical sufficiency. Training a production-grade model on this subset alone is not recommended.
 - **Raw `packets.pcap` is dropped from every bundle in this release.** Two policies apply per fidelity class:
   - `lab-tls-fronted` bundles (17): post-termination cleartext `packets.pcap` is dropped via `tools/strip_pcap.py` (from `nr-bundle-spec`); the pre-termination TLS pcap (`pcap_pre_termination.pcap`) is retained. TLS frames are encrypted; only IP/TCP headers are visible at the pre-term wire vantage.
   - `lab` and `proxy` bundles (81): no pre-term variant exists; the raw `packets.pcap` is dropped and `BundleFiles.packets_pcap=False` is set in the manifest. The remaining Parquet modalities (host plus whichever of app, protocol, responses were captured for the workload) stay intact.
