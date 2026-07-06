@@ -34,6 +34,9 @@ citing the format. Adoption is the point.
   finding into the eleven-family vocabulary.
 - [Methodology](docs/methodology.md): how the Validator Integrity Index is built,
   and what it does and does not yet claim.
+- [Bundles → taxonomy → earned autonomy](docs/integration-bundles-taxonomy-autonomy.md):
+  how the on-disk bundle, the family taxonomy that labels it, and the cross-chain
+  validation that decides where a detector's autonomy is *earned* connect as one pipeline.
 
 ## Why a format?
 
@@ -232,7 +235,16 @@ fixed input must produce the same hex string in both languages.
 
 ## Examples
 
-`examples/` contains 5 reference bundles drawn from a
+**Train a detector on the public corpus.**
+[`examples/train_a_family_detector.py`](examples/train_a_family_detector.py) (and the
+matching [`.ipynb`](examples/train_a_family_detector.ipynb)) is a self-contained,
+runnable walkthrough: download the public [`NullRabbit/nr-bundles-public`](https://huggingface.co/datasets/NullRabbit/nr-bundles-public)
+bundles → read manifest + Parquet → featurise → train over the family taxonomy →
+evaluate both in-distribution and cross-chain (leave-one-chain-out). Public deps only.
+See [Bundles → taxonomy → earned autonomy](docs/integration-bundles-taxonomy-autonomy.md)
+for how to read the two numbers.
+
+`examples/` also contains 5 reference bundles drawn from a
 controlled-lab capture pipeline. Each bundle:
 
 - Has a complete `manifest.json` validated against the schema.
